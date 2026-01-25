@@ -1,5 +1,5 @@
-import { emailExists, createUser } from './repositories/authRepository.js';
-import { hashPassword } from './utils/hashPassword.js';
+import { emailExists, createUser } from '../repositories/authRepository.js';
+import { hashPassword } from '../utils/hashPassword.js';
 
 const registerUserService = async (data) => {
     const { name, email, password } = data;
