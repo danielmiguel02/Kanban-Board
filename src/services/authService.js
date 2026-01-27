@@ -21,7 +21,6 @@ const registerUserService = async (data) => {
     });
 
     return {
-        id: createdUser.id,
         name: createdUser.name,
         email: createdUser.email
     };
