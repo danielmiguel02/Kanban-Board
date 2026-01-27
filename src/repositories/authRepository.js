@@ -3,7 +3,7 @@ import { prisma } from "../config/db.js";
 const createUser = async (data) => {
     const { name, email, hashedPassword } = data;
 
-    prisma.user.create({
+    return prisma.user.create({
         data: {
             name: name,
             email: email,
