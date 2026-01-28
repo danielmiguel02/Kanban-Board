@@ -1,11 +1,12 @@
 import express from 'express';
 import dotenv from 'dotenv';
-
+import { connectDB, disconnectDB } from './config/db.js';
 
 // Import routes
-
+import authRoute from './routes/authRoute.js';
 
 dotenv.config();
+connectDB();
 
 const app = express();
 
@@ -14,7 +15,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // API Routes
-
+app.use('/auth', authRoute);
 
 const PORT = process.env.PORT || 9001;
 const server = app.listen(PORT, () => {
