@@ -1,4 +1,7 @@
-import { registerUserService } from '../services/authService.js';
+import dotenv from 'dotenv';
+import { registerUserService, loginUserService } from '../services/authService.js';
+
+dotenv.config();
 
 const registerUser = async (req, res) => {
     try {
@@ -15,4 +18,26 @@ const registerUser = async (req, res) => {
     };
 };
 
-export { registerUser };
+const loginUser = async (req, res) => {
+    try {
+        const result = loginUserService(req.body);
+
+        res.cookie("jwt", result.token, {
+            httpOnly: true,
+            secore: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 1000 * 60 * 60 * 24 * 7,
+        });
+
+        return res.status(200).json({
+            message: "User logged in successfully",
+            user: result,
+        });
+    } catch (error) {
+        return res.status(400).json({
+            message: error.message
+        });
+    };
+};
+
+export { registerUser, loginUser };
