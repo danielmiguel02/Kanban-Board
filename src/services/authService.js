@@ -1,5 +1,6 @@
-import { emailExists, createUser } from '../repositories/authRepository.js';
+import { findUserByEmail, createUser } from '../repositories/authRepository.js';
 import { hashPassword, checkPassword } from '../utils/hashPassword.js';
+import { generateToken } from '../utils/generateToken.js';
 
 const registerUserService = async (data) => {
     const { name, email, password } = data;
@@ -8,7 +9,7 @@ const registerUserService = async (data) => {
         throw new Error("Email and password are required.");
     }
 
-    if (await emailExists(email)) {
+    if (await findUserByEmail(email)) {
         throw new Error("Email already in use.");
     }
 
@@ -30,17 +31,22 @@ const registerUserService = async (data) => {
 const loginUserService = async (data) => {
     const { email, password } = data;
 
+    const user = await findUserByEmail(email);
+    const isValid = await checkPassword(password, user.password);
+
     if (!email || !password) {
         throw new Error("Email and password are required.");
     }
 
-    if (!await emailExists(email)) {
+    if (!user) {
+        throw new Error("Email or password is wrong.");
+    }
+    
+    if (!isValid) {
         throw new Error("Email or password is wrong.");
     }
 
-    if (!checkPassword(password)) {
-        throw new Error("Email or password is wrong.")
-    }
+    const token = generateToken({id: user.id });
 
     return {
         data: {
