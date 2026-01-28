@@ -20,7 +20,7 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
     try {
-        const result = loginUserService(req.body);
+        const result = await loginUserService(req.body);
 
         res.cookie("jwt", result.token, {
             httpOnly: true,
