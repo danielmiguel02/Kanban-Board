@@ -1,5 +1,5 @@
-import { emailExists, createUser, loginUser } from '../repositories/authRepository.js';
-import { hashPassword, isPasswordValid } from '../utils/hashPassword.js';
+import { emailExists, createUser } from '../repositories/authRepository.js';
+import { hashPassword, checkPassword } from '../utils/hashPassword.js';
 
 const registerUserService = async (data) => {
     const { name, email, password } = data;
@@ -38,14 +38,9 @@ const loginUserService = async (data) => {
         throw new Error("Email or password is wrong.");
     }
 
-    if (!isPasswordValid(password)) {
+    if (!checkPassword(password)) {
         throw new Error("Email or password is wrong.")
     }
-
-    const loggedinUser = await loginUser({
-        email,
-        password
-    });
 
     return {
         data: {
