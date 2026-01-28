@@ -17,7 +17,7 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
     try {
-        const result = loginUserService(req.body);
+        const result = await loginUserService(req.body);
 
         return res.status(200).json({
             message: "User logged in successfully",
