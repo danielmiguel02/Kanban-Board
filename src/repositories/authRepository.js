@@ -12,15 +12,13 @@ const createUser = async (data) => {
     });
 };
 
-const emailExists = async (email) => {
-    const exists = await prisma.user.findUnique({
+const findUserByEmail = async (email) => {
+    return prisma.user.findUnique({
         where: {
-            email: email,
+            email,
         },
     });
-
-    return exists;
 };
 
 
-export { createUser, emailExists };
+export { createUser, findUserByEmail };
