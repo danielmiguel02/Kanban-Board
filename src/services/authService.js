@@ -31,17 +31,18 @@ const registerUserService = async (data) => {
 const loginUserService = async (data) => {
     const { email, password } = data;
 
-    const user = await findUserByEmail(email);
-    const isValid = await checkPassword(password, user.password);
-
     if (!email || !password) {
         throw new Error("Email and password are required.");
     }
 
+    const user = await findUserByEmail(email);
+
     if (!user) {
         throw new Error("Email or password is wrong.");
     }
-    
+
+    const isValid = await checkPassword(password, user.password);
+
     if (!isValid) {
         throw new Error("Email or password is wrong.");
     }
@@ -51,11 +52,11 @@ const loginUserService = async (data) => {
     return {
         data: {
             user: {
-                id: loggedinUser.id,
-                name: loggedinUser.name,
-                email: loggedinUser.email,
+                id: user.id,
+                name: user.name,
+                email: user.email,
             },
-            token: loggedinUser.token
+            token
         },
     };
 };
