@@ -2,7 +2,7 @@ import { createBoardService } from '../services/boardService.js';
 
 const createBoard = async (req, res) => {
     try {
-        const result = createBoardService(req.body);
+        const result = await createBoardService(req.body, req.user.id);
 
         return res.status(201).json({
             message: "Board created successfully",
