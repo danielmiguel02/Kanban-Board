@@ -22,7 +22,7 @@ const editBoard = async (req, res) => {
     try {
         const result = await editBoardService({
             data: req.body,
-            boardId: req.board.id,
+            boardId: req.params.id,
             ownerId: req.user.id,
         });
 
