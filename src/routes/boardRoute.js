@@ -5,6 +5,6 @@ import { authMiddleware } from '../middlewares/authMiddleware.js';
 const router = express.Router();
 
 router.post("/", authMiddleware, createBoard);
-router.patch("/", authMiddleware, editBoard);
+router.patch("/:id", authMiddleware, editBoard);
 
 export default router;
