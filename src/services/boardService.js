@@ -1,4 +1,4 @@
-import { createBoard, editBoard } from '../repositories/boardRepository.js';
+import { createBoard, editBoard, findBoardById } from '../repositories/boardRepository.js';
 
 const createBoardService = async ({data, ownerId}) => {
     const { name } = data;
@@ -30,10 +30,19 @@ const editBoardService = async ({data, boardId, ownerId}) => {
         throw new Error("Name is required to edit a board.");
     }
 
+    const board = await findBoardById(boardId);
+    
+    if (!board) {
+        throw new Error("Board not found");
+    }
+
+    if (board.ownerId !== ownerId) {
+        throw new Error("Now authorized to edit this board")
+    }
+
     const editedBoard = await editBoard({
         name,
-        boardId,
-        ownerId,
+        boardId
     });
 
     return {
