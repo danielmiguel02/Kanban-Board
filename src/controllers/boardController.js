@@ -20,9 +20,16 @@ const createBoard = async (req, res) => {
 
 const editBoard = async (req, res) => {
     try {
+        const boardId = Number(req.params.id);
+        if (isNaN(boardId)) {
+            return res.status(400).json({ 
+                message: "Invalid board ID"
+            });
+        }
+
         const result = await editBoardService({
             data: req.body,
-            boardId: req.board.id,
+            boardId: boardId,
             ownerId: req.user.id,
         });
 
