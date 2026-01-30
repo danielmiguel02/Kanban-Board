@@ -1,7 +1,7 @@
 import { createBoard } from '../repositories/boardRepository.js';
 
-const createBoardService = async (data) => {
-    const { name, userId } = data;
+const createBoardService = async ({data, ownerId}) => {
+    const { name } = data;
 
     if (!name) {
         throw new Error("Name is required to create a board.");
@@ -10,7 +10,7 @@ const createBoardService = async (data) => {
     const createdBoard = await createBoard({
         data: {
             name,
-            ownerId: userId,
+            ownerId: ownerId,
         },
     });
 
@@ -19,7 +19,7 @@ const createBoardService = async (data) => {
             board: {
                 id: createdBoard.id,
                 name: createdBoard.name,
-                ownerId: userId
+                ownerId: ownerId
             },
         },
     };
