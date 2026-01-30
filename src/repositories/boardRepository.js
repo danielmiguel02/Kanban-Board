@@ -11,4 +11,17 @@ const createBoard = async (data) => {
     });
 };
 
-export { createBoard };
+const editBoard = async (data) => {
+    const { name, boardId } = data;
+
+    return prisma.board.update({
+        where: {
+            id: boardId
+        },
+        data: {
+            name: name
+        },
+    });
+};
+
+export { createBoard, editBoard };
