@@ -1,4 +1,4 @@
-import { createBoard } from '../repositories/boardRepository.js';
+import { createBoard, editBoard } from '../repositories/boardRepository.js';
 
 const createBoardService = async ({data, ownerId}) => {
     const { name } = data;
@@ -23,4 +23,28 @@ const createBoardService = async ({data, ownerId}) => {
     };
 };
 
-export { createBoardService };
+const editBoardService = async ({data, boardId, ownerId}) => {
+    const { name } = data;
+
+    if (!name) {
+        throw new Error("Name is required to edit a board.");
+    }
+
+    const editedBoard = await editBoard({
+        name,
+        boardId,
+        ownerId,
+    });
+
+    return {
+        data: {
+            board: {
+                id: editedBoard.id,
+                name: editedBoard.name,
+                ownerId: ownerId
+            },
+        },
+    };
+};
+
+export { createBoardService, editBoardService };
