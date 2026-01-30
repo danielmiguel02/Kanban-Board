@@ -8,10 +8,8 @@ const createBoardService = async ({data, ownerId}) => {
     }
 
     const createdBoard = await createBoard({
-        data: {
-            name,
-            ownerId: ownerId,
-        },
+        name,
+        ownerId,
     });
 
     return {
