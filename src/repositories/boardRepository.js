@@ -24,4 +24,14 @@ const editBoard = async (data) => {
     });
 };
 
-export { createBoard, editBoard };
+const findBoardById = async(data) => {
+    const { boardId } = data;
+
+    return prisma.board.findUnique({
+        where: {
+            id: boardId,
+        },
+    });
+};
+
+export { createBoard, editBoard, findBoardById };
