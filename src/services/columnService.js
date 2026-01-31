@@ -7,7 +7,8 @@ const createColumnService = async ({data, boardId}) => {
         throw new Error("Name is required to create a column.");
     }
 
-    const columnsLastPos = (await getColumnsLastPos(boardId)) ?? 0;
+    const columnsLastPosResult = await getColumnsLastPos(boardId);
+    const columnsLastPos = (columnsLastPosResult._max.position ?? 0);
 
     const createdColumn = await createColumn({
             name,
