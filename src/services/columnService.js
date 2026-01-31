@@ -10,11 +10,9 @@ const createColumnService = async ({data, boardId}) => {
     const columnsLastPos = (await getColumnsLastPos(boardId)) ?? 0;
 
     const createdColumn = await createColumn({
-        data: {
             name,
             position: columnsLastPos + 1,
             boardId
-        },
     });
 
     return {
