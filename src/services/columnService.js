@@ -1,7 +1,7 @@
 import { getColumnsLastPos, createColumn } from "../repositories/columnRepository.js";
 
-const createColumnService = async (data) => {
-    const { name, boardId } = data;
+const createColumnService = async ({data, boardId}) => {
+    const { name } = data;
 
     if (!name) {
         throw new Error("Name is required to create a column.");
