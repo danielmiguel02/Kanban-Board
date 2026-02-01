@@ -1,5 +1,5 @@
 import express from 'express';
-import { createColumn } from '../repositories/columnRepository.js'
+import { createColumn } from '../controllers/columnController.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
