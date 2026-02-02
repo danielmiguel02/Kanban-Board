@@ -1,10 +1,16 @@
-import { getColumnsLastPos, findOwnedColumn, createColumn, editColumn } from "../repositories/columnRepository.js";
+import { getColumnsLastPos, findOwnedColumn, findOwnedBoard, createColumn, editColumn } from "../repositories/columnRepository.js";
 
-const createColumnService = async ({data, boardId}) => {
+const createColumnService = async ({data, boardId, userId}) => {
     const { name } = data;
 
     if (!name) {
         throw new Error("Name is required to create a column.");
+    }
+
+    const board = await findOwnedBoard(boardId, userId);
+
+    if (!board) {
+        throw new Error("Board not found or not authorized");
     }
 
     const columnsLastPosResult = await getColumnsLastPos(boardId);
