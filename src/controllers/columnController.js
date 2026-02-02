@@ -12,7 +12,8 @@ const createColumn = async (req, res) => {
 
         const result = await createColumnService({
             data: req.body,
-            boardId: boardId
+            boardId: boardId,
+            userId: req.user.id
         });
 
         return res.status(201).json({
