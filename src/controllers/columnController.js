@@ -12,7 +12,8 @@ const createColumn = async (req, res) => {
 
         const result = await createColumnService({
             data: req.body,
-            boardId: boardId
+            boardId: boardId,
+            userId: req.user.id
         });
 
         return res.status(201).json({
@@ -38,7 +39,8 @@ const editColumn = async (req, res) => {
 
         const result = await editColumnService({
             data: req.body,
-            columnId: columnId
+            columnId: columnId,
+            userId: req.user.id
         });
 
         return res.status(200).json({
