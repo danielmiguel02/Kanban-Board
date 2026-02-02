@@ -43,4 +43,15 @@ const findOwnedColumn = async (columnId, userId) => {
     });
 };
 
-export { createColumn, editColumn, getColumnsLastPos, findOwnedColumn };
+const findOwnedBoard = async (boardId, userId) => {
+    return prisma.board.findFirst({
+        where: {
+            id: boardId,
+            board: {
+                ownerId: userId,
+            },
+        },
+    });
+};
+
+export { createColumn, editColumn, getColumnsLastPos, findOwnedColumn, findOwnedBoard };
