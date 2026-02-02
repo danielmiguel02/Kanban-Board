@@ -36,7 +36,7 @@ const editColumn = async (req, res) => {
             });
         }
 
-        const result = editColumnService({
+        const result = await editColumnService({
             data: req.body,
             columnId: columnId
         });
