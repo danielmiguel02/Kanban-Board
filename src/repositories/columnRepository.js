@@ -47,9 +47,7 @@ const findOwnedBoard = async (boardId, userId) => {
     return prisma.board.findFirst({
         where: {
             id: boardId,
-            board: {
-                ownerId: userId,
-            },
+            ownerId: userId,
         },
     });
 };
