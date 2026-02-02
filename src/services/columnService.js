@@ -1,4 +1,4 @@
-import { getColumnsLastPos, createColumn } from "../repositories/columnRepository.js";
+import { getColumnsLastPos, findOwnedColumn, createColumn, editColumn } from "../repositories/columnRepository.js";
 
 const createColumnService = async ({data, boardId}) => {
     const { name } = data;
@@ -28,4 +28,34 @@ const createColumnService = async ({data, boardId}) => {
     };
 };
 
-export { createColumnService };
+const editColumnService = async ({data, columnId, userId}) => {
+    const { name } = data;
+
+    if (!name) {
+        throw new Error("Name is required to edit a column");
+    }
+
+    const column = await findOwnedColumn(columnId, userId);
+
+    if (!column) {
+        throw new Error("Column not found or not authorized");
+    }
+
+    const editedColumn = await editColumn({
+        name,
+        columnId
+    });
+
+    return {
+        data: {
+            column: {
+                id: editedColumn.id,
+                name: editedColumn.name,
+                position: editedColumn.position,
+                boardId: editedColumn.boardId
+            },
+        },
+    };
+};
+
+export { createColumnService, editColumnService };

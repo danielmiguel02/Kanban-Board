@@ -12,6 +12,19 @@ const createColumn = async (data) => {
     });
 };
 
+const editColumn = async (data) => {
+    const { name, columnId } = data;
+
+    return prisma.column.update({
+        where: {
+            id: columnId
+        },
+        data: {
+            name: name
+        },
+    });
+};
+
 const getColumnsLastPos = async (boardId) => {
     return prisma.column.aggregate({
         _max: { position: true },
@@ -19,4 +32,15 @@ const getColumnsLastPos = async (boardId) => {
     });
 };
 
-export { createColumn, getColumnsLastPos };
+const findOwnedColumn = async (columnId, userId) => {
+    return prisma.column.findFirst({
+        where: {
+            id: columnId,
+            board: {
+                ownerId: userId,
+            },
+        },
+    });
+};
+
+export { createColumn, editColumn, getColumnsLastPos, findOwnedColumn };
