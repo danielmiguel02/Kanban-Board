@@ -48,7 +48,7 @@ const editCardService = async ({data, cardId, userId}) => {
         throw new Error("Card not found or not authorized");
     }
 
-    const editedCard = editCard({
+    const editedCard = await editCard({
         title,
         cardId
     });
