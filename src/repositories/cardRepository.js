@@ -1,4 +1,3 @@
-// findOwnedCard, getCardsLastPos, createCard
 import { prisma } from "../config/db.js";
 
 const createCard = async (data) => {
@@ -9,6 +8,19 @@ const createCard = async (data) => {
             title: title,
             position: position,
             columnId: columnId
+        },
+    });
+};
+
+const editCard = async (data) => {
+    const { title, cardId } = data;
+
+    return prisma.card.update({
+        where: {
+            id: cardId,
+        },
+        data: {
+            title: title
         },
     });
 };
@@ -33,4 +45,4 @@ const findOwnedCard = async (cardId, userId) => {
     });
 };
 
-export { createCard, getCardsLastPos, findOwnedCard };
+export { createCard, editCard, getCardsLastPos, findOwnedCard };

@@ -1,4 +1,4 @@
-import { createCardService } from "../services/cardService.js";
+import { createCardService, editCardService } from "../services/cardService.js";
 
 const createCard = async (req, res) => {
     try {
@@ -27,4 +27,31 @@ const createCard = async (req, res) => {
     }
 };
 
-export { createCard };
+const editCard = async (req, res) => {
+    try {
+        const cardId = Number(req.params.cardId);
+
+        if (isNaN(cardId)) {
+            return res.status(400).json({
+                message: "Invalid card ID"
+            });
+        }
+
+        const result = await editCardService({
+            data: req.body,
+            cardId: cardId,
+            userId: req.user.id
+        });
+
+        return res.status(200).json({
+            message: "Card edited successfully",
+            card: result,
+        });
+    } catch (error) {
+        return res.status(400).json({
+            message: error.message
+        });
+    }
+};
+
+export { createCard, editCard };
