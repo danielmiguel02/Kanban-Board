@@ -1,4 +1,5 @@
 import { findOwnedCard, getCardsLastPos, createCard} from "../repositories/cardRepository.js";
+import { findOwnedColumn } from "../repositories/columnRepository.js";
 
 const createCardService = async ({data, columnId, userId}) => {
     const { title } = data;
@@ -7,10 +8,10 @@ const createCardService = async ({data, columnId, userId}) => {
         throw new error("Title is required to create a card.");
     }
 
-    const card = await findOwnedCard(columnId, userId);
+    const column = await findOwnedColumn(columnId, userId);
 
-    if (!card) {
-        throw new Error("Card not found or not authorized");
+    if (!column) {
+        throw new Error("Column not found or not authorized");
     }
 
     const cardsLastPosResult = await getCardsLastPos(columnId);
