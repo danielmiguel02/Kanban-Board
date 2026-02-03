@@ -1,4 +1,5 @@
-import { getColumnsLastPos, findOwnedColumn, findOwnedBoard, createColumn, editColumn } from "../repositories/columnRepository.js";
+import { getColumnsLastPos, findOwnedColumn, createColumn, editColumn } from "../repositories/columnRepository.js";
+import { findOwnedBoard } from "../repositories/boardRepository.js";
 
 const createColumnService = async ({data, boardId, userId}) => {
     const { name } = data;
