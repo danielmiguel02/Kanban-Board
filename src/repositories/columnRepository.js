@@ -43,17 +43,4 @@ const findOwnedColumn = async (columnId, userId) => {
     });
 };
 
-<<<<<<< HEAD
-const findOwnedBoard = async (boardId, userId) => {
-    return prisma.board.findFirst({
-        where: {
-            id: boardId,
-            ownerId: userId,
-        },
-    });
-};
-
-export { createColumn, editColumn, getColumnsLastPos, findOwnedColumn, findOwnedBoard };
-=======
 export { createColumn, editColumn, getColumnsLastPos, findOwnedColumn };
->>>>>>> feat/kanban-routes
