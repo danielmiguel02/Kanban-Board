@@ -6,6 +6,7 @@ import { connectDB, disconnectDB } from './config/db.js';
 import authRoute from './routes/authRoute.js';
 import boardRoute from './routes/boardRoute.js';
 import columnRoute from './routes/columnRoute.js';
+import cardRoute from './routes/cardRoute.js';
 
 dotenv.config();
 connectDB();
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/auth', authRoute);
 app.use('/boards', boardRoute);
 app.use('/columns', columnRoute);
+app.use('/cards', cardRoute);
 
 const PORT = process.env.PORT || 9001;
 const server = app.listen(PORT, () => {
