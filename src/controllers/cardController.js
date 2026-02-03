@@ -37,7 +37,7 @@ const editCard = async (req, res) => {
             });
         }
 
-        const result = editCardService({
+        const result = await editCardService({
             data: req.body,
             cardId: cardId,
             userId: req.user.id
