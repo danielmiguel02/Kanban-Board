@@ -32,4 +32,13 @@ const findBoardById = async (id) => {
     });
 };
 
-export { createBoard, editBoard, findBoardById };
+const findOwnedBoard = async (boardId, userId) => {
+    return prisma.board.findFirst({
+        where: {
+            id: boardId,
+            ownerId: userId,
+        },
+    });
+};
+
+export { createBoard, editBoard, findBoardById, findOwnedBoard };
