@@ -1,4 +1,4 @@
-import { createColumnService } from "../services/cardService.js";
+import { createCardService } from "../services/cardService.js";
 
 const createCard = async (req, res) => {
     try {
