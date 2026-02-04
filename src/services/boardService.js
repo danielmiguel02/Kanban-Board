@@ -12,10 +12,6 @@ const createBoardService = async ({data, ownerId}) => {
         ownerId,
     });
 
-    if (!createBoard) {
-        throw new Error("Failed to create board");
-    }
-
     return {
         data: {
             board: {
@@ -49,10 +45,6 @@ const editBoardService = async ({data, boardId, ownerId}) => {
         boardId
     });
 
-    if (!editedBoard) {
-        throw new Error("Failed to edit board");
-    }
-
     return {
         data: {
             board: {
@@ -78,10 +70,6 @@ const deleteBoardService = async ({boardId, ownerId}) => {
     const deletedBoard = await deleteBoard({
         boardId
     });
-
-    if (!deletedBoard) {
-        throw new Error("Failed to delete board");
-    }
 
     await reorderBoards(ownerId);
 
