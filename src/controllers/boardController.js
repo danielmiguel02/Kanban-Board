@@ -55,7 +55,6 @@ const deleteBoard = async (req, res) => {
         }
 
         const result = await deleteBoardService({
-            data: req.body,
             boardId: boardId,
             ownerId: req.user.id,
         });
