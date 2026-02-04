@@ -1,4 +1,4 @@
-import { createBoard, editBoard, deleteBoard, findBoardById, reorderBoards } from '../repositories/boardRepository.js';
+import { createBoard, editBoard, deleteBoard, findBoardById, reorderBoards, getBoardsLastPos } from '../repositories/boardRepository.js';
 
 const createBoardService = async ({data, ownerId}) => {
     const { name } = data;
@@ -7,9 +7,13 @@ const createBoardService = async ({data, ownerId}) => {
         throw new Error("Name is required to create a board.");
     }
 
+    const boardsLastPosResult = await getBoardsLastPos(boardId);
+    const boardsLastPos = (boardsLastPosResult._max.position ?? 0);
+
     const createdBoard = await createBoard({
         name,
         ownerId,
+        position: boardsLastPos + 1,
     });
 
     return {
@@ -17,7 +21,8 @@ const createBoardService = async ({data, ownerId}) => {
             board: {
                 id: createdBoard.id,
                 name: createdBoard.name,
-                ownerId: ownerId
+                ownerId: ownerId,
+                position: boardsLastPos + 1,
             },
         },
     };
