@@ -27,6 +27,7 @@ model Board {
   id        Int      @id @default(autoincrement())
   name      String
   ownerId   String
+  position  Int
   owner     User     @relation(fields: [ownerId], references: [id])
   columns   Column[]
   createdAt DateTime @default(now())
