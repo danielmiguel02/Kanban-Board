@@ -1,12 +1,13 @@
 import { prisma } from "../config/db.js";
 
 const createBoard = async (data) => {
-    const { name, ownerId } = data;
+    const { name, ownerId, position } = data;
 
     return prisma.board.create({
         data: {
             name: name,
             ownerId: ownerId,
+            position: position
         },
     });
 };
