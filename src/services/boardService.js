@@ -7,7 +7,7 @@ const createBoardService = async ({data, ownerId}) => {
         throw new Error("Name is required to create a board.");
     }
 
-    const boardsLastPosResult = await getBoardsLastPos(boardId);
+    const boardsLastPosResult = await getBoardsLastPos(ownerId);
     const boardsLastPos = (boardsLastPosResult._max.position ?? 0);
 
     const createdBoard = await createBoard({
