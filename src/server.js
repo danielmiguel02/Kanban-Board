@@ -1,11 +1,15 @@
 import express from 'express';
 import dotenv from 'dotenv';
-
+import { connectDB, disconnectDB } from './config/db.js';
 
 // Import routes
-
+import authRoute from './routes/authRoute.js';
+import boardRoute from './routes/boardRoute.js';
+import columnRoute from './routes/columnRoute.js';
+import cardRoute from './routes/cardRoute.js';
 
 dotenv.config();
+connectDB();
 
 const app = express();
 
@@ -14,7 +18,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // API Routes
-
+app.use('/auth', authRoute);
+app.use('/boards', boardRoute);
+app.use('/columns', columnRoute);
+app.use('/cards', cardRoute);
 
 const PORT = process.env.PORT || 9001;
 const server = app.listen(PORT, () => {
