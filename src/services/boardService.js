@@ -1,4 +1,4 @@
-import { createBoard, editBoard, findBoardById } from '../repositories/boardRepository.js';
+import { createBoard, editBoard, deleteBoard, findBoardById, reorderBoards } from '../repositories/boardRepository.js';
 
 const createBoardService = async ({data, ownerId}) => {
     const { name } = data;
@@ -11,6 +11,10 @@ const createBoardService = async ({data, ownerId}) => {
         name,
         ownerId,
     });
+
+    if (!createBoard) {
+        throw new Error("Failed to create board");
+    }
 
     return {
         data: {
@@ -37,13 +41,17 @@ const editBoardService = async ({data, boardId, ownerId}) => {
     }
 
     if (board.ownerId !== ownerId) {
-        throw new Error("Now authorized to edit this board")
+        throw new Error("Not authorized to edit this board");
     }
 
     const editedBoard = await editBoard({
         name,
         boardId
     });
+
+    if (!editedBoard) {
+        throw new Error("Failed to edit board");
+    }
 
     return {
         data: {
@@ -56,4 +64,36 @@ const editBoardService = async ({data, boardId, ownerId}) => {
     };
 };
 
-export { createBoardService, editBoardService };
+const deleteBoardService = async ({boardId, ownerId}) => {
+    const board = await findBoardById(boardId);
+
+    if (!board) {
+        throw new Error("Board not found");
+    }
+
+    if (board.ownerId !== ownerId) {
+        throw new Error("Not authorized to delete this board");
+    }
+
+    const deletedBoard = await deleteBoard({
+        boardId
+    });
+
+    if (!deletedBoard) {
+        throw new Error("Failed to delete board");
+    }
+
+    await reorderBoards(ownerId);
+
+    return {
+        data: {
+            board: {
+                id: deletedBoard.id,
+                name: deletedBoard.name,
+                ownerId: ownerId
+            },
+        },
+    };
+};
+
+export { createBoardService, editBoardService, deleteBoardService };
