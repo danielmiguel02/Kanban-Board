@@ -25,6 +25,24 @@ const editColumn = async (data) => {
     });
 };
 
+const deleteColumn = async (data) => {
+    const { columnId } = data;
+
+    return prisma.$transaction(async (tx) => {
+        await tx.card.deleteMany({
+            where: {
+                columnId
+            }
+        });
+
+        await tx.column.delete({
+            where: {
+                columnId
+            }
+        });
+    });
+}
+
 const getColumnsLastPos = async (boardId) => {
     return prisma.column.aggregate({
         _max: { position: true },
@@ -43,4 +61,32 @@ const findOwnedColumn = async (columnId, userId) => {
     });
 };
 
-export { createColumn, editColumn, getColumnsLastPos, findOwnedColumn };
+const reorderColumns = async (userId) => {
+    return prisma.$transaction(async (tx) => {
+        const columns = await tx.column.findMany({
+            where: {
+                board: {
+                    ownerId: userId,
+                },
+            },
+            orderBy: {
+                position: 'asc',
+            },
+        });
+
+        for (let i = 0; i < columns.length; i++) {
+            if (columns[i].position !== i + 1) {
+                await tx.column.update({
+                    where: {
+                        id: columns[i].id
+                    },
+                    data: {
+                        position: i + 1
+                    },
+                });
+            }
+        }
+    });
+};
+
+export { createColumn, editColumn, deleteColumn, getColumnsLastPos, findOwnedColumn, reorderColumns };
