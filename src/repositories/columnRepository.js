@@ -31,14 +31,14 @@ const deleteColumn = async (data) => {
     return prisma.$transaction(async (tx) => {
         await tx.card.deleteMany({
             where: {
-                columnId
-            }
+                columnId,
+            },
         });
 
         await tx.column.delete({
             where: {
-                columnId
-            }
+                id: columnId,
+            },
         });
     });
 }
