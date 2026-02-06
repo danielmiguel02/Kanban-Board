@@ -69,6 +69,13 @@ const findOwnedBoard = async (boardId, userId) => {
     });
 };
 
+const getBoardsLastPos = async (userId) => {
+    return prisma.board.aggregate({
+        _max: { position: true },
+        where: { ownerId: userId },
+    });
+};
+
 const reorderBoards = async (userId) => {
     return prisma.$transaction(async (tx) => {
         const boards = await tx.board.findMany({
@@ -95,4 +102,4 @@ const reorderBoards = async (userId) => {
     });
 };
 
-export { createBoard, editBoard, deleteBoard, findBoardById, findOwnedBoard, reorderBoards };
+export { createBoard, editBoard, deleteBoard, findBoardById, findOwnedBoard, reorderBoards, getBoardsLastPos };

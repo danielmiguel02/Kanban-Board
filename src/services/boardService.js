@@ -7,7 +7,7 @@ const createBoardService = async ({data, ownerId}) => {
         throw new Error("Name is required to create a board.");
     }
 
-    const boardsLastPosResult = await getBoardsLastPos(boardId);
+    const boardsLastPosResult = await getBoardsLastPos(ownerId);
     const boardsLastPos = (boardsLastPosResult._max.position ?? 0);
 
     const createdBoard = await createBoard({
@@ -77,16 +77,6 @@ const deleteBoardService = async ({boardId, ownerId}) => {
     });
 
     await reorderBoards(ownerId);
-
-    return {
-        data: {
-            board: {
-                id: deletedBoard.id,
-                name: deletedBoard.name,
-                ownerId: ownerId
-            },
-        },
-    };
 };
 
 export { createBoardService, editBoardService, deleteBoardService };
