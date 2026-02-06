@@ -64,14 +64,13 @@ const deleteCard = async (req, res) => {
             });
         }
 
-        const result = deleteCardService({
+        deleteCardService({
             cardId: cardId,
             userId: req.user.id,
         });
 
         return res.status(200).json({
-            message: "Card deleted successfully",
-            card: result,
+            message: "Card deleted successfully"
         });
     } catch (error) {
         return res.status(400).json({
