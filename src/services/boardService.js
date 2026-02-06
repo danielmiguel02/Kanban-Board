@@ -77,16 +77,6 @@ const deleteBoardService = async ({boardId, ownerId}) => {
     });
 
     await reorderBoards(ownerId);
-
-    return {
-        data: {
-            board: {
-                id: deletedBoard.id,
-                name: deletedBoard.name,
-                ownerId: ownerId
-            },
-        },
-    };
 };
 
 export { createBoardService, editBoardService, deleteBoardService };
