@@ -64,7 +64,7 @@ const deleteCard = async (req, res) => {
             });
         }
 
-        deleteCardService({
+        await deleteCardService({
             cardId: cardId,
             userId: req.user.id,
         });
