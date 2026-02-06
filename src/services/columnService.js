@@ -1,4 +1,4 @@
-import { getColumnsLastPos, findOwnedColumn, createColumn, editColumn } from "../repositories/columnRepository.js";
+import { getColumnsLastPos, findOwnedColumn, reorderColumns, createColumn, editColumn, deleteColumn } from "../repositories/columnRepository.js";
 import { findOwnedBoard } from "../repositories/boardRepository.js";
 
 const createColumnService = async ({data, boardId, userId}) => {
@@ -65,4 +65,18 @@ const editColumnService = async ({data, columnId, userId}) => {
     };
 };
 
-export { createColumnService, editColumnService };
+const deleteColumnService = async ({columnId, userId}) => {
+    const column = await findOwnedColumn(columnId, userId);
+
+    if (!column) {
+        throw new Error("Column not found or not authorized");
+    }
+
+    await deleteColumn({
+        columnId
+    });
+
+    await reorderColumns(userId);
+};
+
+export { createColumnService, editColumnService, deleteColumnService };
