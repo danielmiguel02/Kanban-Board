@@ -88,18 +88,14 @@ const reorderCards = async (userId) => {
                     position: 'asc',
                 },
             });
-        }
 
-        for (let i = 0; i < cards.length; i++) {
-            if (cards[i].position !== i + 1) {
-                await tx.card.update({
-                    where: {
-                        id: cards[i].id,
-                    },
-                    data: {
-                        position: i + 1,
-                    },
-                });
+            for (let i = 0; i < cards.length; i++) {
+                if (cards[i].position !== i + 1) {
+                    await tx.card.update({
+                        where: { id: cards[i].id },
+                        data: { position: i + 1 },
+                    });
+                }
             }
         }
     });
