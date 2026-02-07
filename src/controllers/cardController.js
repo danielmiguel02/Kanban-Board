@@ -1,4 +1,4 @@
-import { createCardService, editCardService, deleteCardService } from "../services/cardService.js";
+import { createCardService, editCardService, deleteCardService, moveCardToColumnService } from "../services/cardService.js";
 
 const createCard = async (req, res) => {
     try {
@@ -79,4 +79,32 @@ const deleteCard = async (req, res) => {
     }
 };
 
-export { createCard, editCard, deleteCard };
+const moveCardToColumn = async (req, res) => {
+    try {
+        const cardId = Number(req.params.cardId);
+        const columnId = Number(req.params.columnId);
+
+        if (isNaN(cardId) || isNaN(columnId)) {
+            return res.status(400).json({
+                message: "Invalid card or column ID"
+            });
+        }
+
+        const result = await moveCardToColumnService({
+            cardId: cardId,
+            columnId: columnId,
+            userId: req.user.id,
+        });
+
+        return res.status(200).json({
+            message: "Card moved successfully",
+            card: result
+        });
+    } catch (error) {
+        return res.status(400).json({
+            message: message.error,
+        });
+    }
+};
+
+export { createCard, editCard, deleteCard, moveCardToColumn };
