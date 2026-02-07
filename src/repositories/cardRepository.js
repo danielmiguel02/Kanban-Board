@@ -70,18 +70,25 @@ const findOwnedCard = async (cardId, userId) => {
 
 const reorderCards = async (userId) => {
     return prisma.$transaction(async (tx) => {
-        const cards = await tx.card.findMany({
+        const columns = await tx.column.findMany({
             where: {
-                column: {
-                    board: {
-                        ownerId: userId,
-                    },
+                board: {
+                    ownerId: userId,
                 },
             },
-            orderBy: {
-                position: 'asc',
-            },
+            select: { id: true },
         });
+
+        for (const column of columns) {
+            const cards = await tx.card.findMany({
+                where: {
+                    columnId: column.id,
+                },
+                orderBy: {
+                    position: 'asc',
+                },
+            });
+        }
 
         for (let i = 0; i < cards.length; i++) {
             if (cards[i].position !== i + 1) {
