@@ -35,6 +35,19 @@ const deleteCard = async (data) => {
     });
 }
 
+const moveCardToColumn = async (data) => {
+    const { cardId, columnId } = data;
+
+    return prisma.card.update({
+        where: {
+            id: cardId,
+        },
+        data: {
+            columnId: columnId,
+        },
+    });
+}
+
 const getCardsLastPos = async (columnId) => {
     return prisma.card.aggregate({
         _max: { position: true },
@@ -85,4 +98,4 @@ const reorderCards = async (userId) => {
     });
 };
 
-export { createCard, editCard, deleteCard, getCardsLastPos, findOwnedCard, reorderCards };
+export { createCard, editCard, deleteCard, moveCardToColumn, getCardsLastPos, findOwnedCard, reorderCards };
