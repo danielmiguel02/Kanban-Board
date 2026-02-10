@@ -10,6 +10,7 @@ Project is built in Node.js and Express, used Prisma with Neon for database.
 - I set up PORT to be 9000/9001 but it can be changed to any PORT by changing inside .env or server.js.
 - All board, column, and card routes require a valid JWT token sent via the Authorization header.
 - Users can only access and modify boards, columns, and cards they own.
+- If you delete/archive boards/columns it will delete/archive associated with columns/cards.
 
 ## Tech Stack
 - Node.js
@@ -29,6 +30,7 @@ Project is built in Node.js and Express, used Prisma with Neon for database.
 - Move cards between columns
 - Secure routes with ownership checks
 - Board, column, and card positions are automatically updated when creating/deleting/moving.
+- Archive boards, columns, cards.
 
 
 ## API Endpoints
@@ -45,6 +47,7 @@ METHOD       ROUTES                     DESCRIPTION
 -----------------------------------------------------------------------------
 POST         /boards/                   Creates a new board.
 PATCH        /boards/:boardId           Edit board name.
+PATCH        /boards/:boardId/archive   Archives board. (This will archive all columns/cards associated with board.)
 DELETE       /boards/:boardId           Deletes board. (This will delete all columns/cards associated with board.)
 
 COLUMN ROUTES
@@ -52,6 +55,7 @@ METHOD       ROUTES                     DESCRIPTION
 -----------------------------------------------------------------------------
 POST         /columns/:boardId          Creates a new column on the board.
 PATCH        /columns/:columnId         Edit column name.
+PATCH        /columns/:columnId/archive Archives column. (This will archive all cards associated with column.)
 DELETE       /columns/:columnId         Deletes column. (This will delete all cards associated with column.)
 
 CARD ROUTES
@@ -59,8 +63,9 @@ METHOD       ROUTES                     DESCRIPTION
 -----------------------------------------------------------------------------
 POST         /cards/:columnId           Creates a new card on the column.
 PATCH        /cards/:cardId             Edit card title.
-DELETE       /cards/:cardId             Deletes card.
 PATCH        /cards/:cardId/:columnId   Updates card columnId. (This works when you move one card to another column.)
+PATCH        /cards/:cardId/archive     Archives card.
+DELETE       /cards/:cardId             Deletes card.
 
 
 ## Project Setup
