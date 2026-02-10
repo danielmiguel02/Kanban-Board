@@ -1,4 +1,4 @@
-import { createBoard, editBoard, deleteBoard, findBoardById, reorderBoards, getBoardsLastPos } from '../repositories/boardRepository.js';
+import { createBoard, editBoard, deleteBoard, findBoardById, reorderBoards, getBoardsLastPos, archiveBoard } from '../repositories/boardRepository.js';
 
 const createBoardService = async ({data, ownerId}) => {
     const { name } = data;
@@ -72,11 +72,29 @@ const deleteBoardService = async ({boardId, ownerId}) => {
         throw new Error("Not authorized to delete this board");
     }
 
-    const deletedBoard = await deleteBoard({
+    await deleteBoard({
         boardId
     });
 
     await reorderBoards(ownerId);
 };
 
-export { createBoardService, editBoardService, deleteBoardService };
+const archiveBoardService = async ({boardId, userId}) => {
+    const board = await findBoardById(boardId);
+
+    if (!board) {
+        throw new Error("Board not found");
+    }
+
+    if (board.ownerId !== userId) {
+        throw new Error("Not authorized to archive this board");
+    }
+
+    await archiveBoard({
+        boardId
+    });
+
+    await reorderBoards(userId);
+};
+
+export { createBoardService, editBoardService, deleteBoardService, archiveBoardService };
