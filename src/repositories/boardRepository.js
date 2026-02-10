@@ -81,6 +81,7 @@ const reorderBoards = async (userId) => {
         const boards = await tx.board.findMany({
             where: { 
                 ownerId: userId,
+                archived: false,
             },
             orderBy: {
                 position: 'asc',
