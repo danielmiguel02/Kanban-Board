@@ -51,7 +51,7 @@ const moveCardToColumn = async (data) => {
 const getCardsLastPos = async (columnId) => {
     return prisma.card.aggregate({
         _max: { position: true },
-        where: { columnId: columnId },
+        where: { columnId: columnId, archived: false },
     });
 };
 
