@@ -46,7 +46,7 @@ const deleteColumn = async (data) => {
 const getColumnsLastPos = async (boardId) => {
     return prisma.column.aggregate({
         _max: { position: true },
-        where: { boardId: boardId }
+        where: { boardId: boardId, archived: false }
     });
 };
 
