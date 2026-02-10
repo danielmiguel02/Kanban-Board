@@ -65,6 +65,7 @@ const reorderColumns = async (userId) => {
     return prisma.$transaction(async (tx) => {
         const columns = await tx.column.findMany({
             where: {
+                archived: false,
                 board: {
                     ownerId: userId,
                 },
