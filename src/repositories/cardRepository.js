@@ -41,6 +41,7 @@ const moveCardToColumn = async (data) => {
     return prisma.card.update({
         where: {
             id: cardId,
+            archived: false,
         },
         data: {
             columnId: columnId,
@@ -51,7 +52,7 @@ const moveCardToColumn = async (data) => {
 const getCardsLastPos = async (columnId) => {
     return prisma.card.aggregate({
         _max: { position: true },
-        where: { columnId: columnId },
+        where: { columnId: columnId, archived: false },
     });
 };
 
@@ -72,6 +73,7 @@ const reorderCards = async (userId) => {
     return prisma.$transaction(async (tx) => {
         const columns = await tx.column.findMany({
             where: {
+                archived: false,
                 board: {
                     ownerId: userId,
                 },
@@ -83,6 +85,7 @@ const reorderCards = async (userId) => {
             const cards = await tx.card.findMany({
                 where: {
                     columnId: column.id,
+                    archived: false,
                 },
                 orderBy: {
                     position: 'asc',
@@ -101,4 +104,15 @@ const reorderCards = async (userId) => {
     });
 };
 
-export { createCard, editCard, deleteCard, moveCardToColumn, getCardsLastPos, findOwnedCard, reorderCards };
+const archiveCard = async (cardId) => {
+    return prisma.card.update({
+        where: {
+            id: cardId,
+        },
+        data: {
+            archived: true,
+        },
+    });
+};
+
+export { createCard, editCard, deleteCard, moveCardToColumn, getCardsLastPos, findOwnedCard, reorderCards, archiveCard };
