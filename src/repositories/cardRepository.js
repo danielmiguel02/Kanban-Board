@@ -72,6 +72,7 @@ const reorderCards = async (userId) => {
     return prisma.$transaction(async (tx) => {
         const columns = await tx.column.findMany({
             where: {
+                archived: false,
                 board: {
                     ownerId: userId,
                 },
@@ -83,6 +84,7 @@ const reorderCards = async (userId) => {
             const cards = await tx.card.findMany({
                 where: {
                     columnId: column.id,
+                    archived: false,
                 },
                 orderBy: {
                     position: 'asc',
