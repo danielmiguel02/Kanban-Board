@@ -89,4 +89,29 @@ const reorderColumns = async (userId) => {
     });
 };
 
-export { createColumn, editColumn, deleteColumn, getColumnsLastPos, findOwnedColumn, reorderColumns };
+const archiveColumn = async (data) => {
+    const { columnId } = data;
+
+    return prisma.$transaction(async (tx) => {
+        await tx.card.updateMany({
+            where: {
+                columnId,
+                archived: false,
+            },
+            data: {
+                archived: true,
+            },
+        });
+
+        await tx.column.update({
+            where: {
+                id: columnId,
+            },
+            data: {
+                archived: true,
+            },
+        });
+    });
+};
+
+export { createColumn, editColumn, deleteColumn, getColumnsLastPos, findOwnedColumn, reorderColumns, archiveColumn };
