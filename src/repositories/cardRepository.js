@@ -104,7 +104,8 @@ const reorderCards = async (userId) => {
     });
 };
 
-const archiveCard = async (cardId) => {
+const archiveCard = async (data) => {
+    const { cardId } = data;
     return prisma.card.update({
         where: {
             id: cardId,
