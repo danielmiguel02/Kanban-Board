@@ -1,4 +1,4 @@
-import { findOwnedCard, getCardsLastPos, reorderCards, createCard, editCard, deleteCard, moveCardToColumn} from "../repositories/cardRepository.js";
+import { findOwnedCard, getCardsLastPos, reorderCards, createCard, editCard, deleteCard, moveCardToColumn, archiveCard} from "../repositories/cardRepository.js";
 import { findOwnedColumn } from "../repositories/columnRepository.js";
 
 const createCardService = async ({data, columnId, userId}) => {
@@ -111,4 +111,18 @@ const moveCardToColumnService = async ({cardId, columnId, userId}) => {
     };
 };
 
-export { createCardService, editCardService, deleteCardService, moveCardToColumnService };
+const archiveCardService = async ({cardId, userId}) => {
+    const card = await findOwnedCard(cardId, userId);
+
+    if (!card) {
+        throw new Error("Card not found or not authorized");
+    }
+
+    await archiveCard({
+        cardId
+    });
+
+    await reorderCards(userId);
+};
+
+export { createCardService, editCardService, deleteCardService, moveCardToColumnService, archiveCardService };
