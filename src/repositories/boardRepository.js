@@ -72,7 +72,7 @@ const findOwnedBoard = async (boardId, userId) => {
 const getBoardsLastPos = async (userId) => {
     return prisma.board.aggregate({
         _max: { position: true },
-        where: { ownerId: userId },
+        where: { ownerId: userId, archived: false },
     });
 };
 
