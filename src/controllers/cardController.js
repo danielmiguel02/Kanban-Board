@@ -1,4 +1,4 @@
-import { createCardService, editCardService, deleteCardService, moveCardToColumnService } from "../services/cardService.js";
+import { createCardService, editCardService, deleteCardService, moveCardToColumnService, archiveCardService } from "../services/cardService.js";
 
 const createCard = async (req, res) => {
     try {
@@ -107,4 +107,30 @@ const moveCardToColumn = async (req, res) => {
     }
 };
 
-export { createCard, editCard, deleteCard, moveCardToColumn };
+const archiveCard = async (req, res) => {
+    try {
+        const cardId = Number(req.params.cardId);
+
+        if (isNaN(cardId)) {
+            return res.status(400).json({
+                message: "Invalid card ID",
+            });
+        }
+
+        await archiveCardService({
+            cardId: cardId,
+            userId: req.user.id,
+        });
+
+        return res.status(200).json({
+            message: "Card archived successfully",
+        });
+
+    } catch (error) {
+        return res.status(400).json({
+            message: error.message,
+        });
+    }
+} 
+
+export { createCard, editCard, deleteCard, moveCardToColumn, archiveCard };
