@@ -101,4 +101,15 @@ const reorderCards = async (userId) => {
     });
 };
 
-export { createCard, editCard, deleteCard, moveCardToColumn, getCardsLastPos, findOwnedCard, reorderCards };
+const archiveCard = async (cardId) => {
+    return prisma.card.update({
+        where: {
+            id: cardId,
+        },
+        data: {
+            archived: true,
+        },
+    });
+};
+
+export { createCard, editCard, deleteCard, moveCardToColumn, getCardsLastPos, findOwnedCard, reorderCards, archiveCard };
