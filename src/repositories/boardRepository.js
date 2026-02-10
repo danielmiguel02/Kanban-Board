@@ -72,7 +72,7 @@ const findOwnedBoard = async (boardId, userId) => {
 const getBoardsLastPos = async (userId) => {
     return prisma.board.aggregate({
         _max: { position: true },
-        where: { ownerId: userId },
+        where: { ownerId: userId, archived: false },
     });
 };
 
@@ -81,6 +81,7 @@ const reorderBoards = async (userId) => {
         const boards = await tx.board.findMany({
             where: { 
                 ownerId: userId,
+                archived: false,
             },
             orderBy: {
                 position: 'asc',
@@ -102,4 +103,41 @@ const reorderBoards = async (userId) => {
     });
 };
 
-export { createBoard, editBoard, deleteBoard, findBoardById, findOwnedBoard, reorderBoards, getBoardsLastPos };
+const archiveBoard = async (data) => {
+    const { boardId } = data;
+
+    return prisma.$transaction(async (tx) => {
+        await tx.card.updateMany({
+            where: {
+                column: {
+                    boardId,
+                },
+                archived: false,
+            },
+            data: {
+                archived: true,
+            },
+        });
+
+        await tx.column.updateMany({
+            where: {
+                boardId,
+                archived: false,
+            },
+            data: {
+                archived: true,
+            },
+        });
+
+        await tx.board.update({
+            where: {
+                id: boardId,
+            },
+            data: {
+                archived: true,
+            },
+        });
+    });
+};
+
+export { createBoard, editBoard, deleteBoard, findBoardById, findOwnedBoard, reorderBoards, getBoardsLastPos, archiveBoard };
