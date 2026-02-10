@@ -41,6 +41,7 @@ const moveCardToColumn = async (data) => {
     return prisma.card.update({
         where: {
             id: cardId,
+            archived: false,
         },
         data: {
             columnId: columnId,
