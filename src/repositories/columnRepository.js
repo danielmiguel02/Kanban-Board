@@ -118,13 +118,26 @@ const archiveColumn = async (data) => {
 const unarchiveColumn = async (data) => {
     const { columnId } = data;
 
-    return prisma.column.update({
-        where: {
-            id: columnId,
-        },
-        data: {
-            archived: false,
-        },
+    return prisma.$transaction(async (tx) => {
+
+        await tx.card.updateMany({
+            where: {
+                columnId,
+                archived: true,
+            },
+            data: {
+                archived: false,
+            },
+        });
+        
+        await tx.column.update({
+            where: {
+                id: columnId,
+            },
+            data: {
+                archived: false,
+            },
+        });
     });
 };
 
