@@ -140,6 +140,43 @@ const archiveBoard = async (data) => {
     });
 };
 
+const unarchiveBoard = async (data) => {
+    const { boardId } = data;
+
+    return prisma.$transaction(async (tx) => {
+        await tx.card.updateMany({
+            where: {
+                column: {
+                    boardId,
+                },
+                archived: true,
+            },
+            data: {
+                archived: false,
+            },
+        });
+
+        await tx.column.updateMany({
+            where: {
+                boardId,
+                archived: true,
+            },
+            data: {
+                archived: false,
+            },
+        });
+
+        await tx.board.update({
+            where: {
+                id: boardId,
+            },
+            data: {
+                archived: false,
+            },
+        });
+    });
+}
+
 const isBoardArchived = async (boardId) => {
     return prisma.board.findUnique({
         where: {
@@ -151,4 +188,4 @@ const isBoardArchived = async (boardId) => {
     });
 };
 
-export { createBoard, editBoard, deleteBoard, findBoardById, findOwnedBoard, reorderBoards, getBoardsLastPos, archiveBoard, isBoardArchived };
+export { createBoard, editBoard, deleteBoard, findBoardById, findOwnedBoard, reorderBoards, getBoardsLastPos, archiveBoard, unarchiveBoard, isBoardArchived };
