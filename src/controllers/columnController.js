@@ -1,4 +1,4 @@
-import { createColumnService, editColumnService, deleteColumnService, archiveColumnService } from '../services/columnService.js';
+import { createColumnService, editColumnService, deleteColumnService, archiveColumnService, unarchiveColumnService } from '../services/columnService.js';
 
 const createColumn = async (req, res) => {
     try {
@@ -107,4 +107,30 @@ const archiveColumn = async (req, res) => {
     }
 };
 
-export { createColumn, editColumn, deleteColumn, archiveColumn };
+const unarchiveColumn = async (req, res) => {
+    try {
+        const columnId = Number(req.params.columnId);
+
+        if (isNaN(columnId)) {
+            return res.status(400).json({
+                message: "Invalid column ID",
+            });
+        }
+
+        await unarchiveColumnService({
+            columnId: columnId,
+            userId: req.user.id,
+        });
+
+        return res.status(200).json({
+            message: "Column unarchived successfully",
+        });
+
+    } catch (error) {
+        return res.status(400).json({
+            message: error.message,
+        });
+    }
+};
+
+export { createColumn, editColumn, deleteColumn, archiveColumn, unarchiveColumn };
