@@ -1,5 +1,5 @@
-import { getColumnsLastPos, findOwnedColumn, reorderColumns, createColumn, editColumn, deleteColumn, archiveColumn } from "../repositories/columnRepository.js";
-import { findOwnedBoard } from "../repositories/boardRepository.js";
+import { getColumnsLastPos, findOwnedColumn, reorderColumns, createColumn, editColumn, deleteColumn, archiveColumn, unarchiveColumn, isColumnArchived } from "../repositories/columnRepository.js";
+import { findOwnedBoard, isBoardArchived } from "../repositories/boardRepository.js";
 
 const createColumnService = async ({data, boardId, userId}) => {
     const { name } = data;
@@ -93,4 +93,30 @@ const archiveColumnService = async ({columnId, userId}) => {
     await reorderColumns(userId);
 };
 
-export { createColumnService, editColumnService, deleteColumnService, archiveColumnService };
+const unarchiveColumnService = async ({columnId, userId}) => {
+    const column = await findOwnedColumn(columnId, userId);
+
+    if (!column) {
+        throw new Error("Column not found or not authorized");
+    }
+
+    const columnArchived = await isColumnArchived(columnId);
+
+    if (!columnArchived) {
+        throw new Error("Column is not archived, can't unarchive");
+    }
+
+    const boardArchived = await isBoardArchived(column.boardId);
+
+    if (boardArchived) {
+        throw new Error("Column board is archived, can't unarchive");
+    }
+
+    await unarchiveColumn({
+        columnId
+    });
+
+    await reorderColumns(userId);
+};
+
+export { createColumnService, editColumnService, deleteColumnService, archiveColumnService, unarchiveColumnService };
