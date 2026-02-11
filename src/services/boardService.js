@@ -1,4 +1,4 @@
-import { createBoard, editBoard, deleteBoard, findBoardById, reorderBoards, getBoardsLastPos, archiveBoard } from '../repositories/boardRepository.js';
+import { createBoard, editBoard, deleteBoard, findBoardById, reorderBoards, getBoardsLastPos, archiveBoard, unarchiveBoard, isBoardArchived } from '../repositories/boardRepository.js';
 
 const createBoardService = async ({data, ownerId}) => {
     const { name } = data;
@@ -97,4 +97,28 @@ const archiveBoardService = async ({boardId, userId}) => {
     await reorderBoards(userId);
 };
 
-export { createBoardService, editBoardService, deleteBoardService, archiveBoardService };
+const unarchiveBoardService = async ({boardId, userId}) => {
+    const board = await findBoardById(boardId);
+
+    if (!board) {
+        throw new Error("Board not found");
+    }
+
+    if (board.ownerId !== userId) {
+        throw new Error("Not authorized to unarchive this board");
+    }
+    
+    const boardArchived = await isBoardArchived(boardId);
+
+    if (!boardArchived) {
+        throw new Error("Board is not archived, can't unarchive");
+    }
+
+    await unarchiveBoard({
+        boardId
+    });
+
+    await reorderBoards(userId);
+};
+
+export { createBoardService, editBoardService, deleteBoardService, archiveBoardService, unarchiveBoardService };
