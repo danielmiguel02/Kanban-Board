@@ -1,5 +1,5 @@
 import { findOwnedCard, getCardsLastPos, reorderCards, createCard, editCard, deleteCard, moveCardToColumn, archiveCard, unarchiveCard, isCardArchived} from "../repositories/cardRepository.js";
-import { findOwnedColumn } from "../repositories/columnRepository.js";
+import { findOwnedColumn, isColumnArchived } from "../repositories/columnRepository.js";
 
 const createCardService = async ({data, columnId, userId}) => {
     const { title } = data;
@@ -136,6 +136,12 @@ const unarchiveCardService = async ({cardId, userId}) => {
 
     if (!isArchived?.archived) {
         throw new Error("Card is not archived, can't unarchive");
+    }
+
+    const isColumnArchived = await isColumnArchived(card.columnId);
+
+    if (isColumnArchived) {
+        throw new Error("Card column is archived, can't unarchive");
     }
 
     await unarchiveCard({
