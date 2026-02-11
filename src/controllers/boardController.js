@@ -1,4 +1,4 @@
-import { createBoardService, editBoardService, deleteBoardService, archiveBoardService } from '../services/boardService.js';
+import { createBoardService, editBoardService, deleteBoardService, archiveBoardService, unarchiveBoardService } from '../services/boardService.js';
 
 const createBoard = async (req, res) => {
     try {
@@ -91,9 +91,35 @@ const archiveBoard = async (req, res) => {
 
     } catch (error) {
         return res.status(400).json({
-            message: message.error,
+            message: error.message,
         });
     }
 };
 
-export { createBoard, editBoard, deleteBoard, archiveBoard };
+const unarchiveBoard = async (req, res) => {
+    try {
+        const boardId = Number(req.params.boardId);
+
+        if (isNaN(boardId)) {
+            return res.status(400).json({
+                message: "Invalid board ID",
+            });
+        }
+
+        await unarchiveBoardService({
+            boardId: boardId,
+            userId: req.user.id,
+        });
+
+        return res.status(200).json({
+            message: "Board unarchived successfully",
+        });
+
+    } catch (error) {
+        return res.status(400).json({
+            message: error.message,
+        });
+    }
+};
+
+export { createBoard, editBoard, deleteBoard, archiveBoard, unarchiveBoard };
