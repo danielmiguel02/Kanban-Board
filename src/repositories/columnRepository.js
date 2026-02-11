@@ -115,6 +115,19 @@ const archiveColumn = async (data) => {
     });
 };
 
+const unarchiveColumn = async (data) => {
+    const { columnId } = data;
+
+    return prisma.column.update({
+        where: {
+            id: columnId,
+        },
+        data: {
+            archived: false,
+        },
+    });
+};
+
 const isColumnArchived = async (columnId) => {
     return prisma.column.findUnique({
         where: {
@@ -126,4 +139,4 @@ const isColumnArchived = async (columnId) => {
     });
 };
 
-export { createColumn, editColumn, deleteColumn, getColumnsLastPos, findOwnedColumn, reorderColumns, archiveColumn, isColumnArchived };
+export { createColumn, editColumn, deleteColumn, getColumnsLastPos, findOwnedColumn, reorderColumns, archiveColumn, unarchiveColumn, isColumnArchived };
