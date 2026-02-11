@@ -116,4 +116,28 @@ const archiveCard = async (data) => {
     });
 };
 
-export { createCard, editCard, deleteCard, moveCardToColumn, getCardsLastPos, findOwnedCard, reorderCards, archiveCard };
+const unarchiveCard = async (data) => {
+    const { cardId } = data;
+
+    return prisma.card.update({
+        where: {
+            id: cardId,
+        },
+        data: {
+            archived: false,
+        },
+    });
+};
+
+const isCardArchived = async (cardId) => {
+    return prisma.card.findUnique({
+        where: {
+            id: cardId,
+        },
+        select: {
+            archived: true,
+        },
+    });
+};
+
+export { createCard, editCard, deleteCard, moveCardToColumn, getCardsLastPos, findOwnedCard, reorderCards, archiveCard, unarchiveCard, isCardArchived };
