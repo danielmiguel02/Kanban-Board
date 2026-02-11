@@ -134,7 +134,7 @@ const unarchiveCardService = async ({cardId, userId}) => {
 
     const isArchived = await isCardArchived(cardId);
 
-    if (!isArchived) {
+    if (!isArchived?.archived) {
         throw new Error("Card is not archived, can't unarchive");
     }
 
