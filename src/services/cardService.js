@@ -138,15 +138,9 @@ const unarchiveCardService = async ({cardId, userId}) => {
         throw new Error("Card is not archived, can't unarchive");
     }
 
-<<<<<<< HEAD
     const columnArchived  = await isColumnArchived(card.columnId);
 
     if (columnArchived ) {
-=======
-    const columnArchived = await isColumnArchived(card.columnId);
-
-    if (columnArchived) {
->>>>>>> feat/kanban-repository
         throw new Error("Card column is archived, can't unarchive");
     }
 
