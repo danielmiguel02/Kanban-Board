@@ -115,4 +115,15 @@ const archiveColumn = async (data) => {
     });
 };
 
-export { createColumn, editColumn, deleteColumn, getColumnsLastPos, findOwnedColumn, reorderColumns, archiveColumn };
+const isColumnArchived = async (columnId) => {
+    return prisma.column.findUnique({
+        where: {
+            id: columnId,
+        },
+        select: {
+            archived: true,
+        },
+    });
+};
+
+export { createColumn, editColumn, deleteColumn, getColumnsLastPos, findOwnedColumn, reorderColumns, archiveColumn, isColumnArchived };
