@@ -132,15 +132,15 @@ const unarchiveCardService = async ({cardId, userId}) => {
         throw new Error("Card not found or not authorized");
     }
 
-    const isArchived = await isCardArchived(cardId);
+    const cardArchived = await isCardArchived(cardId);
 
-    if (!isArchived?.archived) {
+    if (!cardArchived?.archived) {
         throw new Error("Card is not archived, can't unarchive");
     }
 
-    const isColumnArchived = await isColumnArchived(card.columnId);
+    const columnArchived = await isColumnArchived(card.columnId);
 
-    if (isColumnArchived) {
+    if (columnArchived) {
         throw new Error("Card column is archived, can't unarchive");
     }
 

@@ -140,4 +140,15 @@ const archiveBoard = async (data) => {
     });
 };
 
-export { createBoard, editBoard, deleteBoard, findBoardById, findOwnedBoard, reorderBoards, getBoardsLastPos, archiveBoard };
+const isBoardArchived = async (boardId) => {
+    return prisma.board.findUnique({
+        where: {
+            id: boardId,
+        },
+        select: {
+            archived: true,
+        },
+    });
+};
+
+export { createBoard, editBoard, deleteBoard, findBoardById, findOwnedBoard, reorderBoards, getBoardsLastPos, archiveBoard, isBoardArchived };
