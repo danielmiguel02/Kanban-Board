@@ -90,6 +90,12 @@ const archiveBoardService = async ({boardId, userId}) => {
         throw new Error("Not authorized to archive this board");
     }
 
+    const boardArchived = await isBoardArchived(boardId);
+
+    if (boardArchived?.archived) {
+        throw new Error("Board is not unarchived, can't archive");
+    }
+
     await archiveBoard({
         boardId
     });
