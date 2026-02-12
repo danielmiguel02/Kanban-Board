@@ -110,7 +110,7 @@ const unarchiveBoardService = async ({boardId, userId}) => {
     
     const boardArchived = await isBoardArchived(boardId);
 
-    if (!boardArchived) {
+    if (!boardArchived?.archived) {
         throw new Error("Board is not archived, can't unarchive");
     }
 
