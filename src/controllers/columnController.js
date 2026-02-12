@@ -102,7 +102,7 @@ const archiveColumn = async (req, res) => {
 
     } catch (error) {
         return res.status(400).json({
-            message: message.error,
+            message: error.message,
         });
     }
 };
