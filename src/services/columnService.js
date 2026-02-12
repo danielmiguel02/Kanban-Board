@@ -102,7 +102,7 @@ const unarchiveColumnService = async ({columnId, userId}) => {
 
     const columnArchived = await isColumnArchived(columnId);
 
-    if (!columnArchived) {
+    if (!columnArchived?.archived) {
         throw new Error("Column is not archived, can't unarchive");
     }
 
