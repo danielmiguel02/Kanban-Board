@@ -86,6 +86,18 @@ const archiveColumnService = async ({columnId, userId}) => {
         throw new Error("Column not found or not authorized");
     }
 
+    const archivedColumn = await isColumnArchived(columnId);
+
+    if (archivedColumn?.archived) {
+        throw new Error("Column is not unarchived, can't archive");
+    }
+
+    const archivedBoard = await isBoardArchived(column.boardId);
+
+    if (archivedBoard?.archived) {
+        throw new Error("Column board is archived, can't archive");
+    }
+
     await archiveColumn({
         columnId
     });
