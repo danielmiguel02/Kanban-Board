@@ -118,6 +118,18 @@ const archiveCardService = async ({cardId, userId}) => {
         throw new Error("Card not found or not authorized");
     }
 
+    const cardArchived = await isCardArchived(cardId);
+
+    if (cardArchived?.archived) {
+        throw new Error("Card is not unarchived, can't archive");
+    }
+
+    const columnArchived = await isColumnArchived(card.columnId);
+
+    if (columnArchived?.archived) {
+        throw new Error("Card column is archived, can't archive");
+    }
+
     await archiveCard({
         cardId
     });
