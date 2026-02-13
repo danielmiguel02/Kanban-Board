@@ -14,35 +14,37 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
-  boards    Board[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String        @id @default(uuid())
+  name         String
+  email        String        @unique
+  password     String
+  boards       Board[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  boardMembers BoardMember[]
 }
 
 model Board {
-  id        Int      @id @default(autoincrement())
-  name      String
-  ownerId   String
-  position  Int      @default(0)
-  archived  Boolean  @default(false)
-  owner     User     @relation(fields: [ownerId], references: [id])
-  columns   Column[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           Int           @id @default(autoincrement())
+  name         String
+  ownerId      String
+  position     Int           @default(0)
+  archived     Boolean       @default(false)
+  owner        User          @relation(fields: [ownerId], references: [id])
+  columns      Column[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  boardMembers BoardMember[]
 }
 
 model Column {
-  id        Int    @id @default(autoincrement())
-  name      String
-  position  Int
-  boardId   Int
-  archived  Boolean @default(false)
-  board     Board  @relation(fields: [boardId], references: [id])
-  cards     Card[]
+  id       Int     @id @default(autoincrement())
+  name     String
+  position Int
+  boardId  Int
+  archived Boolean @default(false)
+  board    Board   @relation(fields: [boardId], references: [id])
+  cards    Card[]
 }
 
 model Card {
@@ -50,8 +52,28 @@ model Card {
   title     String
   position  Int
   columnId  Int
-  archived  Boolean @default(false)
-  column    Column  @relation(fields: [columnId], references: [id])
+  archived  Boolean  @default(false)
+  column    Column   @relation(fields: [columnId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model BoardMember {
+  id      Int    @id @default(autoincrement())
+  boardId Int
+  userId  String
+  board   Board  @relation(fields: [boardId], references: [id])
+  user    User   @relation(fields: [userId], references: [id])
+
+  role Role @default(VIEW)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([boardId, userId])
+}
+
+enum Role {
+  VIEW
+  EDIT
 }
