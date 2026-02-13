@@ -1,5 +1,5 @@
 import { findBoardById } from "../repositories/boardRepository.js";
-import { findUserByEmail } from "../repositories/userRepository.js";
+import { findUserByEmail } from "../repositories/authRepository.js";
 import { findBoardMember, createBoardMember } from "../repositories/boardMemberRepository.js";
 
 
