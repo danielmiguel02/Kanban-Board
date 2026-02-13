@@ -36,6 +36,10 @@ const addMembersToBoardService = async ({data, boardId, userId}) => {
         throw new Error("User is already a member of this board");
     }
 
+    if (user.id == userId) {
+        throw new Error("Can't add owner to members");
+    }
+
     const boardMember = await createBoardMember({
         boardId,
         userId: user.id,
