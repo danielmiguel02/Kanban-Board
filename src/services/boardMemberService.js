@@ -1,6 +1,6 @@
 import { findBoardById } from "../repositories/boardRepository.js";
 import { findUserByEmail } from "../repositories/authRepository.js";
-import { findBoardMember, createBoardMember, removeBoardMember } from "../repositories/boardMemberRepository.js";
+import { findBoardMember, createBoardMember, removeBoardMember, editBoardMemberRole } from "../repositories/boardMemberRepository.js";
 
 
 const addMembersToBoardService = async ({data, boardId, userId}) => {
@@ -91,4 +91,47 @@ const removeMembersFromBoardService = async ({data, boardId, userId}) => {
     });
 };
 
-export { addMembersToBoardService, removeMembersFromBoardService };
+const editMembersRoleFromBoardService = async ({data, boardId, userId}) => {
+    const { email, role } = data;
+
+    if (!email) {
+        throw new Error("Email is required to edit member role");
+    }
+
+    if (!role) {
+        throw new Error("Role is required to edit member role");
+    }
+
+    if (!["VIEW", "EDIT"].includes(role)) {
+        throw new Error("Invalid role");
+    }
+
+    const board = await findBoardById(boardId);
+
+    if (!board) {
+        throw new Error("Board not found");
+    }
+
+    if (board.ownerId !== userId) {
+        throw new Error("Not authorized to edit member role")
+    }
+
+    const user = await findUserByEmail(email);
+
+    if (!user) {
+        throw new Error("User not found by that email");
+    }
+
+    const existingMember = await findBoardMember(boardId, user.id);
+
+    if (!existingMember) {
+        throw new Error("User is not a member of this board");
+    }
+
+    await editBoardMemberRole({
+        boardId,
+        userId: user.id
+    });
+};
+
+export { addMembersToBoardService, removeMembersFromBoardService, editMembersRoleFromBoardService };
