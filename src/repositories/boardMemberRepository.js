@@ -21,4 +21,13 @@ const createBoardMember = async ({boardId, userId, role}) => {
     });
 };
 
-export { findBoardMember, createBoardMember };
+const removeBoardMember = async ({boardId, userId}) => {
+    return prisma.boardMember.remove({
+        where: {
+            boardId,
+            userId
+        }
+    });
+}
+
+export { findBoardMember, createBoardMember, removeBoardMember };
