@@ -32,4 +32,18 @@ const removeBoardMember = async ({boardId, userId}) => {
     });
 }
 
-export { findBoardMember, createBoardMember, removeBoardMember };
+const editBoardMemberRole = async ({boardId, userId, role}) => {
+    return prisma.boardMember.update({
+        where: {
+            boardId_userId: {
+                boardId,
+                userId,
+            },
+        },
+        data: {
+            role: role,
+        },
+    });
+};
+
+export { findBoardMember, createBoardMember, removeBoardMember, editBoardMemberRole };
