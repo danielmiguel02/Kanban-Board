@@ -130,7 +130,8 @@ const editMembersRoleFromBoardService = async ({data, boardId, userId}) => {
 
     await editBoardMemberRole({
         boardId,
-        userId: user.id
+        userId: user.id,
+        role
     });
 };
 
