@@ -79,7 +79,7 @@ const removeMembersFromBoardService = async ({data, boardId, userId}) => {
         throw new Error("User not found by that email");
     }
 
-    const existingMember = await findBoardMember(boardId, userId);
+    const existingMember = await findBoardMember(boardId, user.id);
 
     if (!existingMember) {
         throw new Error("User is not a member of this board");
