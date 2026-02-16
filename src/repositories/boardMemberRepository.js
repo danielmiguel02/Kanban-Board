@@ -24,8 +24,10 @@ const createBoardMember = async ({boardId, userId, role}) => {
 const removeBoardMember = async ({boardId, userId}) => {
     return prisma.boardMember.delete({
         where: {
-            boardId,
-            userId
+            boardId_userId: {
+                boardId,
+                userId,
+            },
         }
     });
 }
