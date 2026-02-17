@@ -69,6 +69,14 @@ const findOwnedCard = async (cardId, userId) => {
     });
 };
 
+const findCardById = async (cardId) => {
+    return prisma.card.findUnique({
+        where: {
+            id: cardId,
+        },
+    });
+};
+
 const reorderCards = async (userId) => {
     return prisma.$transaction(async (tx) => {
         const columns = await tx.column.findMany({
@@ -140,4 +148,4 @@ const isCardArchived = async (cardId) => {
     });
 };
 
-export { createCard, editCard, deleteCard, moveCardToColumn, getCardsLastPos, findOwnedCard, reorderCards, archiveCard, unarchiveCard, isCardArchived };
+export { createCard, editCard, deleteCard, moveCardToColumn, getCardsLastPos, findOwnedCard, findCardById, reorderCards, archiveCard, unarchiveCard, isCardArchived };

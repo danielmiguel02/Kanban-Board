@@ -61,6 +61,14 @@ const findOwnedColumn = async (columnId, userId) => {
     });
 };
 
+const findColumnById = async (columnId) => {
+    return prisma.column.findUnique({
+        where: {
+            id: columnId,
+        },
+    });
+};
+
 const reorderColumns = async (userId) => {
     return prisma.$transaction(async (tx) => {
         const columns = await tx.column.findMany({
@@ -152,4 +160,4 @@ const isColumnArchived = async (columnId) => {
     });
 };
 
-export { createColumn, editColumn, deleteColumn, getColumnsLastPos, findOwnedColumn, reorderColumns, archiveColumn, unarchiveColumn, isColumnArchived };
+export { createColumn, editColumn, deleteColumn, getColumnsLastPos, findOwnedColumn, findColumnById, reorderColumns, archiveColumn, unarchiveColumn, isColumnArchived };
