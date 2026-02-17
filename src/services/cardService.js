@@ -1,17 +1,28 @@
-import { findOwnedCard, getCardsLastPos, reorderCards, createCard, editCard, deleteCard, moveCardToColumn, archiveCard, unarchiveCard, isCardArchived} from "../repositories/cardRepository.js";
-import { findOwnedColumn, isColumnArchived } from "../repositories/columnRepository.js";
+import { findCardById, getCardsLastPos, reorderCards, createCard, editCard, deleteCard, moveCardToColumn, archiveCard, unarchiveCard} from "../repositories/cardRepository.js";
+import { findColumnById } from "../repositories/columnRepository.js";
+import { checkBoardPermission } from "./permissionService.js";
 
 const createCardService = async ({data, columnId, userId}) => {
     const { title } = data;
 
     if (!title) {
-        throw new error("Title is required to create a card.");
+        throw new Error("Title is required to create a card.");
     }
 
-    const column = await findOwnedColumn(columnId, userId);
+    const column = await findColumnById(columnId);
 
     if (!column) {
-        throw new Error("Column not found or not authorized");
+        throw new Error("Column not found");
+    }
+
+    await checkBoardPermission({
+        boardId: column.boardId,
+        userId,
+        requiredRole: "EDIT",
+    });
+
+    if (column.archived) {
+        throw new Error("Column is archived can't edit card");
     }
 
     const cardsLastPosResult = await getCardsLastPos(columnId);
@@ -35,17 +46,37 @@ const createCardService = async ({data, columnId, userId}) => {
     };
 };
 
-const editCardService = async ({data, cardId, userId}) => {
+const editCardService = async ({ data, cardId, userId }) => {
     const { title } = data;
 
     if (!title) {
         throw new Error("Title is required to edit card");
     }
 
-    const card = await findOwnedCard(cardId, userId);
+    const card = await findCardById(cardId);
 
     if (!card) {
-        throw new Error("Card not found or not authorized");
+        throw new Error("Card not found");
+    }
+
+    const column = await findColumnById(card.columnId);
+
+    if (!column) {
+        throw new Error("Column not found");
+    }
+
+    await checkBoardPermission({
+        boardId: column.boardId,
+        userId,
+        requiredRole: "EDIT",
+    });
+
+    if (card.archived) {
+        throw new Error("Card is archived can't edit card");
+    }
+
+    if (column.archived) {
+        throw new Error("Column is archived can't edit card");
     }
 
     const editedCard = await editCard({
@@ -66,11 +97,23 @@ const editCardService = async ({data, cardId, userId}) => {
 };
 
 const deleteCardService = async ({cardId, userId}) => {
-    const card = await findOwnedCard(cardId, userId);
+    const card = await findCardById(cardId);
 
     if (!card) {
-        throw new Error("Card not found or not authorized");
+        throw new Error("Card not found");
     }
+
+    const column = await findColumnById(card.columnId);
+
+    if (!column) {
+        throw new Error("Column not found");
+    }
+
+    await checkBoardPermission({
+        boardId: column.boardId,
+        userId,
+        requiredRole: "EDIT",
+    });
 
     await deleteCard({
         cardId
@@ -80,16 +123,30 @@ const deleteCardService = async ({cardId, userId}) => {
 };
 
 const moveCardToColumnService = async ({cardId, columnId, userId}) => {
-    const card = await findOwnedCard(cardId, userId);
+    const card = await findCardById(cardId);
 
     if (!card) {
-        throw new Error("Card not found or not authorized");
+        throw new Error("Card not found");
     }
 
-    const column = await findOwnedColumn(columnId, userId);
+    const column = await findColumnById(columnId);
 
     if (!column) {
-        throw new Error("Column not found or not authorized");
+        throw new Error("Column not found");
+    }
+
+    await checkBoardPermission({
+        boardId: column.boardId,
+        userId,
+        requiredRole: "EDIT",
+    });
+
+    if (card.archived) {
+        throw new Error("Card is archived can't move card");
+    }
+
+    if (column.archived) {
+        throw new Error("Column is archived can't move card");
     }
 
     const movedCard = await moveCardToColumn({
@@ -112,22 +169,30 @@ const moveCardToColumnService = async ({cardId, columnId, userId}) => {
 };
 
 const archiveCardService = async ({cardId, userId}) => {
-    const card = await findOwnedCard(cardId, userId);
+    const card = await findCardById(cardId);
 
     if (!card) {
-        throw new Error("Card not found or not authorized");
+        throw new Error("Card not found");
     }
 
-    const cardArchived = await isCardArchived(cardId);
+    const column = await findColumnById(card.columnId);
 
-    if (cardArchived?.archived) {
-        throw new Error("Card is not unarchived, can't archive");
+    if (!column) {
+        throw new Error("Column not found");
     }
 
-    const columnArchived = await isColumnArchived(card.columnId);
+    await checkBoardPermission({
+        boardId: column.boardId,
+        userId,
+        requiredRole: "EDIT",
+    });
 
-    if (columnArchived?.archived) {
-        throw new Error("Card column is archived, can't archive");
+    if (card.archived) {
+        throw new Error("Card is already archived, can't archive");
+    }
+
+    if (column.archived) {
+        throw new Error("Card column is archived, can't archive card");
     }
 
     await archiveCard({
@@ -138,22 +203,30 @@ const archiveCardService = async ({cardId, userId}) => {
 };
 
 const unarchiveCardService = async ({cardId, userId}) => {
-    const card = await findOwnedCard(cardId, userId);
+    const card = await findCardById(cardId);
 
     if (!card) {
-        throw new Error("Card not found or not authorized");
+        throw new Error("Card not found");
     }
 
-    const cardArchived = await isCardArchived(cardId);
+    const column = await findColumnById(card.columnId);
 
-    if (!cardArchived?.archived) {
+    if (!column) {
+        throw new Error("Column not found");
+    }
+
+    await checkBoardPermission({
+        boardId: column.boardId,
+        userId,
+        requiredRole: "EDIT",
+    });
+
+    if (!card.archived) {
         throw new Error("Card is not archived, can't unarchive");
     }
 
-    const columnArchived  = await isColumnArchived(card.columnId);
-
-    if (columnArchived ) {
-        throw new Error("Card column is archived, can't unarchive");
+    if (column.archived) {
+        throw new Error("Card column is archived, can't unarchive card");
     }
 
     await unarchiveCard({
