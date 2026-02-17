@@ -26,4 +26,4 @@ const checkBoardPermission = async ({boardId, userId, requiredRole}) => {
     return board;
 };
 
-return { checkBoardPermission };
+export { checkBoardPermission };
