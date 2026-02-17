@@ -10,7 +10,10 @@ Project is built in Node.js and Express, used Prisma with Neon for database.
 - I set up PORT to be 9000/9001 but it can be changed to any PORT by changing inside .env or server.js.
 - All board, column, and card routes require a valid JWT token sent via the Authorization header.
 - Users can only access and modify boards, columns, and cards they own.
-- If you delete/archive boards/columns it will delete/archive associated with columns/cards.
+- If you delete/archive/unarchive boards/columns it will delete/archive/unarchive associated with columns/cards.
+- Positions are only updated to boards/columns/cards that are unarchived.
+- You can't move cards that are archived.
+- Adding members to a board requires you to be the owner of that board.
 
 ## Tech Stack
 - Node.js
@@ -30,7 +33,9 @@ Project is built in Node.js and Express, used Prisma with Neon for database.
 - Move cards between columns
 - Secure routes with ownership checks
 - Board, column, and card positions are automatically updated when creating/deleting/moving.
-- Archive boards, columns, cards.
+- Archive/Unarchive boards, columns, cards.
+- Other members can be added/removed to your board.
+- Board owner can change member role.
 
 
 ## API Endpoints
@@ -46,17 +51,22 @@ BOARD ROUTES
 METHOD       ROUTES                     DESCRIPTION
 -----------------------------------------------------------------------------
 POST         /boards/                   Creates a new board.
+POST         /boards/:boardId/members   Adds member to board.
 PATCH        /boards/:boardId           Edit board name.
 PATCH        /boards/:boardId/archive   Archives board. (This will archive all columns/cards associated with board.)
+PATCH        /boards/:boardId/unarchive Unarchived board. (This will unarchive all columns/cards associated with board.)
+PATCH        /boards/:boardId/members   Edit member role. (EDIT, VIEW)
 DELETE       /boards/:boardId           Deletes board. (This will delete all columns/cards associated with board.)
+DELETE       /boards/:boardId/members   Removed member from board.
 
 COLUMN ROUTES
-METHOD       ROUTES                     DESCRIPTION
+METHOD       ROUTES                        DESCRIPTION
 -----------------------------------------------------------------------------
-POST         /columns/:boardId          Creates a new column on the board.
-PATCH        /columns/:columnId         Edit column name.
-PATCH        /columns/:columnId/archive Archives column. (This will archive all cards associated with column.)
-DELETE       /columns/:columnId         Deletes column. (This will delete all cards associated with column.)
+POST         /columns/:boardId             Creates a new column on the board.
+PATCH        /columns/:columnId            Edit column name.
+PATCH        /columns/:columnId/archive    Archives column. (This will archive all cards associated with column.)
+PATCH        /columns/:columnId/unarchive  Unarhives column. (This will unarchive all cards associated with column.)
+DELETE       /columns/:columnId            Deletes column. (This will delete all cards associated with column.)
 
 CARD ROUTES
 METHOD       ROUTES                     DESCRIPTION
@@ -65,6 +75,7 @@ POST         /cards/:columnId           Creates a new card on the column.
 PATCH        /cards/:cardId             Edit card title.
 PATCH        /cards/:cardId/:columnId   Updates card columnId. (This works when you move one card to another column.)
 PATCH        /cards/:cardId/archive     Archives card.
+PATCH        /cards/:cardId/unarchive   Unarchives card.
 DELETE       /cards/:cardId             Deletes card.
 
 
@@ -115,6 +126,23 @@ BOARD CREATE (http://localhost:9000/boards/)
 BOARD EDIT (http://localhost:9000/boards/:boardId)
 {
     "name": "board edited name"
+}
+
+BOARD ADD MEMBERS (http://localhost:9000/boards/:boardId/members)
+{
+    "email": "emailtoaddmember@gmail.com",
+    "role": "VIEW" or "EDIT" (Role has a default value of VIEW)
+}
+
+BOARD EDIT MEMBERS ROLE
+{
+    "email": "emailtoeditrole@gmail.com",
+    "role": "VIEW" or "EDIT"
+}
+
+BOARD REMOVE MEMBERS (http://localhost:9000/boards/:boardId/members)
+{
+    "email": "emailtoremovemember@gmail.com"
 }
 
 COLUMN CREATE (http://localhost:9000/columns/:boardId)
