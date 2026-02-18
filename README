@@ -69,14 +69,14 @@ PATCH        /columns/:columnId/unarchive  Unarhives column. (This will unarchiv
 DELETE       /columns/:columnId            Deletes column. (This will delete all cards associated with column.)
 
 CARD ROUTES
-METHOD       ROUTES                     DESCRIPTION
+METHOD       ROUTES                          DESCRIPTION
 -----------------------------------------------------------------------------
-POST         /cards/:columnId           Creates a new card on the column.
-PATCH        /cards/:cardId             Edit card title.
-PATCH        /cards/:cardId/:columnId   Updates card columnId. (This works when you move one card to another column.)
-PATCH        /cards/:cardId/archive     Archives card.
-PATCH        /cards/:cardId/unarchive   Unarchives card.
-DELETE       /cards/:cardId             Deletes card.
+POST         /cards/:columnId                Creates a new card on the column.
+PATCH        /cards/:cardId                  Edit card title.
+PATCH        /cards/:cardId/move/:columnId   Updates card columnId. (This works when you move one card to another column.)
+PATCH        /cards/:cardId/archive          Archives card.
+PATCH        /cards/:cardId/unarchive        Unarchives card.
+DELETE       /cards/:cardId                  Deletes card.
 
 
 ## Project Setup
