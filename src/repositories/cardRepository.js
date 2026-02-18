@@ -56,19 +56,6 @@ const getCardsLastPos = async (columnId) => {
     });
 };
 
-const findOwnedCard = async (cardId, userId) => {
-    return prisma.card.findFirst({
-        where: {
-            id: cardId,
-            column: {
-                board: {
-                    ownerId: userId,
-                },
-            },
-        },
-    });
-};
-
 const findCardById = async (cardId) => {
     return prisma.card.findUnique({
         where: {
@@ -137,15 +124,4 @@ const unarchiveCard = async (data) => {
     });
 };
 
-const isCardArchived = async (cardId) => {
-    return prisma.card.findUnique({
-        where: {
-            id: cardId,
-        },
-        select: {
-            archived: true,
-        },
-    });
-};
-
-export { createCard, editCard, deleteCard, moveCardToColumn, getCardsLastPos, findOwnedCard, findCardById, reorderCards, archiveCard, unarchiveCard, isCardArchived };
+export { createCard, editCard, deleteCard, moveCardToColumn, getCardsLastPos, findCardById, reorderCards, archiveCard, unarchiveCard };
