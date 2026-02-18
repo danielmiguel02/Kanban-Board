@@ -168,4 +168,4 @@ const unarchiveBoard = async (data) => {
     });
 }
 
-export { createBoard, editBoard, deleteBoard, findBoardById, findOwnedBoard, reorderBoards, getBoardsLastPos, archiveBoard, unarchiveBoard, isBoardArchived };
+export { createBoard, editBoard, deleteBoard, findBoardById, reorderBoards, getBoardsLastPos, archiveBoard, unarchiveBoard };
