@@ -1,4 +1,4 @@
-import { createBoard, editBoard, deleteBoard, findBoardById, reorderBoards, getBoardsLastPos, archiveBoard, unarchiveBoard, isBoardArchived } from '../repositories/boardRepository.js';
+import { createBoard, editBoard, deleteBoard, findBoardById, reorderBoards, getBoardsLastPos, archiveBoard, unarchiveBoard } from '../repositories/boardRepository.js';
 
 const createBoardService = async ({data, ownerId}) => {
     const { name } = data;
@@ -43,6 +43,10 @@ const editBoardService = async ({data, boardId, ownerId}) => {
 
     if (board.ownerId !== ownerId) {
         throw new Error("Not authorized to edit this board");
+    }
+
+    if (board.archived) {
+        throw new Error("Can't edit archived board");
     }
 
     const editedBoard = await editBoard({
@@ -90,10 +94,8 @@ const archiveBoardService = async ({boardId, userId}) => {
         throw new Error("Not authorized to archive this board");
     }
 
-    const boardArchived = await isBoardArchived(boardId);
-
-    if (boardArchived?.archived) {
-        throw new Error("Board is not unarchived, can't archive");
+    if (board.archived) {
+        throw new Error("Board is already archived, can't archive");
     }
 
     await archiveBoard({
@@ -113,10 +115,8 @@ const unarchiveBoardService = async ({boardId, userId}) => {
     if (board.ownerId !== userId) {
         throw new Error("Not authorized to unarchive this board");
     }
-    
-    const boardArchived = await isBoardArchived(boardId);
 
-    if (!boardArchived?.archived) {
+    if (!board.archived) {
         throw new Error("Board is not archived, can't unarchive");
     }
 
