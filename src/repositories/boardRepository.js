@@ -60,15 +60,6 @@ const findBoardById = async (id) => {
     });
 };
 
-const findOwnedBoard = async (boardId, userId) => {
-    return prisma.board.findFirst({
-        where: {
-            id: boardId,
-            ownerId: userId,
-        },
-    });
-};
-
 const getBoardsLastPos = async (userId) => {
     return prisma.board.aggregate({
         _max: { position: true },
@@ -176,16 +167,5 @@ const unarchiveBoard = async (data) => {
         });
     });
 }
-
-const isBoardArchived = async (boardId) => {
-    return prisma.board.findUnique({
-        where: {
-            id: boardId,
-        },
-        select: {
-            archived: true,
-        },
-    });
-};
 
 export { createBoard, editBoard, deleteBoard, findBoardById, findOwnedBoard, reorderBoards, getBoardsLastPos, archiveBoard, unarchiveBoard, isBoardArchived };
