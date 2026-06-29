@@ -9,7 +9,6 @@ import columnRoute from './routes/columnRoute.js';
 import cardRoute from './routes/cardRoute.js';
 
 dotenv.config();
-connectDB();
 
 const app = express();
 
@@ -24,9 +23,23 @@ app.use('/columns', columnRoute);
 app.use('/cards', cardRoute);
 
 const PORT = process.env.PORT || 9001;
-const server = app.listen(PORT, () => {
-    console.log(`Server running on PORT ${PORT}`);
-});
+const startServer = async () => {
+    try {
+        await connectDB();
+        console.log("DB connected");
+
+        const server = app.listen(PORT, () => {
+            console.log(`Server running on PORT ${PORT}`);
+        });
+
+        return server;
+    } catch (err) {
+        console.error("Failed to start server:", err);
+        process.exit(1);
+    }
+};
+
+startServer();
 
 
 // Handle unhandled promise rejections
