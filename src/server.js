@@ -8,7 +8,13 @@ import boardRoute from './routes/boardRoute.js';
 import columnRoute from './routes/columnRoute.js';
 import cardRoute from './routes/cardRoute.js';
 
-dotenv.config();
+// Load .env locally only
+if (process.env.NODE_ENV !== 'production') {
+    import('dotenv').then(dotenv => dotenv.config());
+}
+
+// DB connection
+connectDB();
 
 const app = express();
 
@@ -22,25 +28,19 @@ app.use('/boards', boardRoute);
 app.use('/columns', columnRoute);
 app.use('/cards', cardRoute);
 
-const PORT = process.env.PORT || 9001;
-const startServer = async () => {
-    try {
-        await connectDB();
-        console.log("DB connected");
+/* =========================
+   START SERVER
+========================= */
 
-        const server = app.listen(PORT, () => {
-            console.log(`Server running on PORT ${PORT}`);
-        });
+const PORT = process.env.PORT || 3001;
 
-        return server;
-    } catch (err) {
-        console.error("Failed to start server:", err);
-        process.exit(1);
-    }
-};
+const server = httpServer.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on PORT ${PORT}`);
+});
 
-startServer();
-
+/* =========================
+   ERROR HANDLING
+========================= */
 
 // Handle unhandled promise rejections
 process.on("unhandledRejection", (err) => {
