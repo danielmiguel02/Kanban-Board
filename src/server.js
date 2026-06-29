@@ -1,5 +1,4 @@
 import express from 'express';
-import dotenv from 'dotenv';
 import { createServer } from "http";
 import { connectDB, disconnectDB } from './config/db.js';
 
@@ -13,9 +12,6 @@ import cardRoute from './routes/cardRoute.js';
 if (process.env.NODE_ENV !== 'production') {
     import('dotenv').then(dotenv => dotenv.config());
 }
-
-// DB connection
-connectDB();
 
 const app = express();
 
@@ -36,10 +32,18 @@ app.use('/cards', cardRoute);
 // Create HTTP server
 const httpServer = createServer(app);
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 9001;
 
-const server = httpServer.listen(PORT, '0.0.0.0', () => {
+const server = httpServer.listen(PORT, '0.0.0.0', async () => {
     console.log(`Server running on PORT ${PORT}`);
+
+    // IMPORTANT: connect AFTER server is up
+    try {
+        await connectDB();
+        console.log("DB connected");
+    } catch (err) {
+        console.error("DB connection failed:", err);
+    }
 });
 
 /* =========================
