@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import { createServer } from "http";
 import { connectDB, disconnectDB } from './config/db.js';
 
 // Import routes
@@ -31,6 +32,9 @@ app.use('/cards', cardRoute);
 /* =========================
    START SERVER
 ========================= */
+
+// Create HTTP server
+const httpServer = createServer(app);
 
 const PORT = process.env.PORT || 3001;
 
