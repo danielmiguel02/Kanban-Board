@@ -32,7 +32,7 @@ app.use('/cards', cardRoute);
 // Create HTTP server
 const httpServer = createServer(app);
 
-const PORT = process.env.PORT || 9001;
+const PORT = process.env.PORT || 9000;
 
 const server = httpServer.listen(PORT, '0.0.0.0', async () => {
     console.log(`Server running on PORT ${PORT}`);
