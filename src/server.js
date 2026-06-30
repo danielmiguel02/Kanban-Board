@@ -2,6 +2,7 @@ import express from 'express';
 import { createServer } from "http";
 import { connectDB, disconnectDB } from './config/db.js';
 import cookieParser from "cookie-parser";
+import path from "path";
 
 // Import routes
 import authRoute from './routes/authRoute.js';
