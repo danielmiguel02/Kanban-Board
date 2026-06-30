@@ -16,10 +16,32 @@ if (process.env.NODE_ENV !== 'production') {
 
 const app = express();
 
+/* =========================
+   MIDDLEWARE
+========================= */
+
 // Body parse middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+/* =========================
+   STATIC FILES
+========================= */
+
+app.use(express.static(
+    path.join(path.resolve(), 'public')
+));
+
+app.get('/', (req, res) => {
+    res.sendFile(
+        path.join(path.resolve(), 'public', 'index.html')
+    );
+});
+
+/* =========================
+   ROUTES
+========================= */
 
 // API Routes
 app.use('/auth', authRoute);
