@@ -3,6 +3,19 @@ import { registerUserService, loginUserService } from '../services/authService.j
 
 dotenv.config();
 
+const getCurrentUser = async (req, res) => {
+    try {
+        res.json({
+            authenticated: true,
+            user: req.user
+        });
+    } catch (error) {
+        return res.status(400).json({
+            message: error.message,
+        });
+    }
+};
+
 const registerUser = async (req, res) => {
     try {
         const result = await registerUserService(req.body);
@@ -24,7 +37,7 @@ const loginUser = async (req, res) => {
 
         res.cookie("jwt", result.token, {
             httpOnly: true,
-            secore: process.env.NODE_ENV === "production",
+            secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
             maxAge: 1000 * 60 * 60 * 24 * 7,
         });
@@ -55,4 +68,4 @@ const logout = async (req, res) => {
     });
 };
 
-export { registerUser, loginUser, logout};
+export { getCurrentUser, registerUser, loginUser, logout};
