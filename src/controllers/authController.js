@@ -3,6 +3,19 @@ import { registerUserService, loginUserService } from '../services/authService.j
 
 dotenv.config();
 
+const getCurrentUser = async (req, res) => {
+    try {
+        res.json({
+            authenticated: true,
+            user: req.user
+        });
+    } catch (error) {
+        return res.status(400).json({
+            message: error.message,
+        });
+    }
+};
+
 const registerUser = async (req, res) => {
     try {
         const result = await registerUserService(req.body);
@@ -54,4 +67,4 @@ const logout = async (req, res) => {
     });
 };
 
-export { registerUser, loginUser, logout};
+export { getCurrentUser, registerUser, loginUser, logout};
