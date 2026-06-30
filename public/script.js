@@ -56,7 +56,7 @@ async function registerUser(e) {
 
     const body = {
 
-        username: document.getElementById("registerUsername").value.trim(),
+        name: document.getElementById("registername").value.trim(),
         email: document.getElementById("registerEmail").value.trim(),
         password: document.getElementById("registerPassword").value
 
