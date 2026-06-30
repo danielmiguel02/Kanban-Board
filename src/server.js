@@ -1,6 +1,7 @@
 import express from 'express';
 import { createServer } from "http";
 import { connectDB, disconnectDB } from './config/db.js';
+import cookieParser from "cookie-parser";
 
 // Import routes
 import authRoute from './routes/authRoute.js';
@@ -18,6 +19,7 @@ const app = express();
 // Body parse middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // API Routes
 app.use('/auth', authRoute);
