@@ -1,6 +1,6 @@
 const API = "https://kanbanboard.fly.dev";
 
-const username = document.getElementById("username");
+const name = document.getElementById("name");
 
 const ownedBoards = document.getElementById("ownedBoards");
 
@@ -37,7 +37,7 @@ async function getCurrentUser() {
 
     const data = await response.json();
 
-    username.textContent = data.user.name;
+    name.textContent = data.user.name;
 
 }
 
