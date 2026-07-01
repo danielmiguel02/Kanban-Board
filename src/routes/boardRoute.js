@@ -1,5 +1,5 @@
 import express from 'express';
-import { createBoard, editBoard, deleteBoard, archiveBoard, unarchiveBoard, addMembersToBoard, removeMembersFromBoard } from '../controllers/boardController.js';
+import { createBoard, editBoard, deleteBoard, archiveBoard, unarchiveBoard, addMembersToBoard, removeMembersFromBoard, editMembersRoleFromBoard } from '../controllers/boardController.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
@@ -12,5 +12,6 @@ router.patch("/:boardId/unarchive", authMiddleware, unarchiveBoard);
 
 router.post("/:boardId/members", authMiddleware, addMembersToBoard);
 router.delete("/:boardId/members", authMiddleware, removeMembersFromBoard);
+router.patch("/:boardId/members", authMiddleware, editMembersRoleFromBoard);
 
 export default router;
