@@ -1,5 +1,23 @@
 import { prisma } from "../config/db.js";
 
+const getBoardsRepository = async (userId) => {
+    return prisma.board.findMany({
+        where: {
+            ownerId: userId,
+            archived: false,
+        },
+        select: {
+            id: true,
+            name: true,
+            position: true,
+            archived: true,
+        },
+        orderBy: {
+            position: "asc",
+        },
+    });
+};
+
 const createBoard = async (data) => {
     const { name, ownerId, position } = data;
 
@@ -168,4 +186,4 @@ const unarchiveBoard = async (data) => {
     });
 }
 
-export { createBoard, editBoard, deleteBoard, findBoardById, reorderBoards, getBoardsLastPos, archiveBoard, unarchiveBoard };
+export { getBoardsRepository, createBoard, editBoard, deleteBoard, findBoardById, reorderBoards, getBoardsLastPos, archiveBoard, unarchiveBoard };
