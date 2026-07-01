@@ -1,4 +1,4 @@
-const API = "https://kanbanboard.fly.dev";
+const API = "";
 
 const loginTab = document.getElementById("loginTab");
 const registerTab = document.getElementById("registerTab");
