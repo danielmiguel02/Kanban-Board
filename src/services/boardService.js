@@ -1,5 +1,15 @@
 import { createBoard, editBoard, deleteBoard, findBoardById, reorderBoards, getBoardsLastPos, archiveBoard, unarchiveBoard } from '../repositories/boardRepository.js';
 
+const getBoardsService = async (userId) => {
+    if (!userId) {
+        throw new Error("User is required to get boards.")
+    }
+
+    const boards = await getBoardsRepository(userId);
+
+    return boards;
+};
+
 const createBoardService = async ({data, ownerId}) => {
     const { name } = data;
 
@@ -127,4 +137,4 @@ const unarchiveBoardService = async ({boardId, userId}) => {
     await reorderBoards(userId);
 };
 
-export { createBoardService, editBoardService, deleteBoardService, archiveBoardService, unarchiveBoardService };
+export { getBoardsService, createBoardService, editBoardService, deleteBoardService, archiveBoardService, unarchiveBoardService };
