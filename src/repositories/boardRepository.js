@@ -19,11 +19,12 @@ const getBoardsRepository = async (userId) => {
 };
 
 const createBoard = async (data) => {
-    const { name, ownerId, position } = data;
+    const { name, color, ownerId, position } = data;
 
     return prisma.board.create({
         data: {
             name: name,
+            color: color,
             ownerId: ownerId,
             position: position
         },
@@ -31,14 +32,15 @@ const createBoard = async (data) => {
 };
 
 const editBoard = async (data) => {
-    const { name, boardId } = data;
+    const { name, color, boardId } = data;
 
     return prisma.board.update({
         where: {
             id: boardId
         },
         data: {
-            name: name
+            name: name,
+            color: color,
         },
     });
 };

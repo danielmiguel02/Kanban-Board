@@ -11,7 +11,7 @@ const getBoardsService = async (userId) => {
 };
 
 const createBoardService = async ({data, ownerId}) => {
-    const { name } = data;
+    const { name, color } = data;
 
     if (!name) {
         throw new Error("Name is required to create a board.");
@@ -22,6 +22,7 @@ const createBoardService = async ({data, ownerId}) => {
 
     const createdBoard = await createBoard({
         name,
+        color,
         ownerId,
         position: boardsLastPos + 1,
     });
@@ -31,6 +32,7 @@ const createBoardService = async ({data, ownerId}) => {
             board: {
                 id: createdBoard.id,
                 name: createdBoard.name,
+                color: createdBoard.color,
                 ownerId: ownerId,
                 position: boardsLastPos + 1,
             },
@@ -39,7 +41,7 @@ const createBoardService = async ({data, ownerId}) => {
 };
 
 const editBoardService = async ({data, boardId, ownerId}) => {
-    const { name } = data;
+    const { name, color } = data;
 
     if (!name) {
         throw new Error("Name is required to edit a board.");
@@ -61,6 +63,7 @@ const editBoardService = async ({data, boardId, ownerId}) => {
 
     const editedBoard = await editBoard({
         name,
+        color,
         boardId
     });
 
@@ -69,6 +72,7 @@ const editBoardService = async ({data, boardId, ownerId}) => {
             board: {
                 id: editedBoard.id,
                 name: editedBoard.name,
+                color: editedBoard.color,
                 ownerId: ownerId
             },
         },
