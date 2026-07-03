@@ -1,19 +1,30 @@
 const API = "https://kanbanboard.fly.dev";
 
 const name = document.getElementById("name");
-
 const ownedBoards = document.getElementById("ownedBoards");
-
 const sharedBoards = document.getElementById("sharedBoards");
 
-document
-    .getElementById("logoutBtn")
-    .addEventListener("click", logout);
+const createBoardBtn = document.getElementById("createBoardBtn");
+const saveBoardBtn = document.getElementById("saveBoardBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+
+let modal;
+
+/* =========================
+   PAGE LOAD
+========================= */
 
 document.addEventListener("DOMContentLoaded", async () => {
 
-    await getCurrentUser();
+    modal = new bootstrap.Modal(
+        document.getElementById("createBoardModal")
+    );
 
+    createBoardBtn.addEventListener("click", openCreateBoardModal);
+    saveBoardBtn.addEventListener("click", createBoard);
+    logoutBtn.addEventListener("click", logout);
+
+    await getCurrentUser();
     await loadBoards();
 
 });
@@ -24,20 +35,26 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 async function getCurrentUser() {
 
-    const response = await fetch(`${API}/auth/me`, {
-        credentials: "include"
-    });
+    try {
 
-    if (!response.ok) {
+        const response = await fetch(`${API}/auth/me`, {
+            credentials: "include"
+        });
 
-        window.location.href = "index.html";
-        return;
+        if (!response.ok) {
+            window.location.href = "index.html";
+            return;
+        }
+
+        const data = await response.json();
+
+        name.textContent = data.user.name;
+
+    } catch (error) {
+
+        console.error(error);
 
     }
-
-    const data = await response.json();
-
-    name.textContent = data.user.name;
 
 }
 
@@ -47,25 +64,27 @@ async function getCurrentUser() {
 
 async function loadBoards() {
 
-    const response = await fetch(`${API}/boards`, {
+    try {
 
-        credentials: "include"
+        const response = await fetch(`${API}/boards`, {
+            credentials: "include"
+        });
 
-    });
+        if (!response.ok) {
+            alert("Unable to load boards.");
+            return;
+        }
 
-    if (!response.ok) {
+        const data = await response.json();
 
-        alert("Unable to load boards.");
+        renderOwnedBoards(data.ownedBoards);
+        renderSharedBoards(data.sharedBoards);
 
-        return;
+    } catch (error) {
+
+        console.error(error);
 
     }
-
-    const data = await response.json();
-
-    renderOwnedBoards(data.ownedBoards);
-
-    renderSharedBoards(data.sharedBoards);
 
 }
 
@@ -81,13 +100,9 @@ function renderOwnedBoards(boards) {
 
         ownedBoards.innerHTML = `
             <div class="col-12">
-
                 <div class="alert alert-secondary">
-
                     You don't have any boards yet.
-
                 </div>
-
             </div>
         `;
 
@@ -98,27 +113,32 @@ function renderOwnedBoards(boards) {
     boards.forEach(board => {
 
         ownedBoards.innerHTML += `
+            <div class="col-md-4">
 
-        <div class="col-md-4">
+                <div
+                    class="card shadow board-card text-white"
+                    data-id="${board.id}"
+                    onclick="openBoard(${board.id})"
+                    style="
+                        background:${board.color};
+                        cursor:pointer;
+                        min-height:140px;
+                        border:none;
+                    ">
 
-            <div
-                class="card shadow-sm board-card"
-                data-id="${board.id}">
+                    <div class="card-body d-flex align-items-end">
 
-                <div class="card-body">
+                        <h5 class="fw-bold">
 
-                    <h5>
+                            ${board.name}
 
-                        ${board.name}
+                        </h5>
 
-                    </h5>
+                    </div>
 
                 </div>
 
             </div>
-
-        </div>
-
         `;
 
     });
@@ -137,13 +157,9 @@ function renderSharedBoards(boards) {
 
         sharedBoards.innerHTML = `
             <div class="col-12">
-
                 <div class="alert alert-secondary">
-
                     No shared boards.
-
                 </div>
-
             </div>
         `;
 
@@ -154,44 +170,126 @@ function renderSharedBoards(boards) {
     boards.forEach(member => {
 
         sharedBoards.innerHTML += `
+            <div class="col-md-4">
 
-        <div class="col-md-4">
+                <div
+                    class="card shadow board-card text-white"
+                    onclick="openBoard(${member.board.id})"
+                    style="
+                        background:${member.board.color};
+                        cursor:pointer;
+                        min-height:140px;
+                        border:none;
+                    ">
 
-            <div
-                class="card shadow-sm">
+                    <div class="card-body d-flex flex-column justify-content-end h-100">
 
-                <div class="card-body">
+                        <h5 class="fw-bold">
 
-                    <h5>
+                            ${member.board.name}
 
-                        ${member.board.name}
+                        </h5>
 
-                    </h5>
+                        <small>
 
-                    <small class="text-muted">
+                            Owner: ${member.board.owner.name}
 
-                        Owner:
-                        ${member.board.owner.name}
+                        </small>
 
-                    </small>
+                        <span class="badge bg-light text-dark mt-2 w-auto">
 
-                    <br>
+                            ${member.role}
 
-                    <span class="badge bg-primary mt-2">
+                        </span>
 
-                        ${member.role}
-
-                    </span>
+                    </div>
 
                 </div>
 
             </div>
-
-        </div>
-
         `;
 
     });
+
+}
+
+/* =========================
+   CREATE BOARD MODAL
+========================= */
+
+function openCreateBoardModal() {
+
+    document.getElementById("boardName").value = "";
+    document.getElementById("boardColor").value = "#0d6efd";
+
+    modal.show();
+
+}
+
+/* =========================
+   CREATE BOARD
+========================= */
+
+async function createBoard() {
+
+    const body = {
+
+        name: document.getElementById("boardName").value.trim(),
+        color: document.getElementById("boardColor").value
+
+    };
+
+    if (!body.name) {
+
+        alert("Board name is required.");
+        return;
+
+    }
+
+    try {
+
+        const response = await fetch(`${API}/boards`, {
+
+            method: "POST",
+
+            credentials: "include",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(body)
+
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+
+            alert(data.message);
+            return;
+
+        }
+
+        modal.hide();
+
+        await loadBoards();
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+}
+
+/* =========================
+   OPEN BOARD
+========================= */
+
+function openBoard(boardId) {
+
+    window.location.href = `board.html?id=${boardId}`;
 
 }
 
@@ -201,14 +299,22 @@ function renderSharedBoards(boards) {
 
 async function logout() {
 
-    await fetch(`${API}/auth/logout`, {
+    try {
 
-        method: "POST",
+        await fetch(`${API}/auth/logout`, {
 
-        credentials: "include"
+            method: "POST",
 
-    });
+            credentials: "include"
 
-    window.location.href = "index.html";
+        });
+
+        window.location.href = "index.html";
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
 
 }
