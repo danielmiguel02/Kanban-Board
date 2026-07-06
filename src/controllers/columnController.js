@@ -4,7 +4,7 @@ const getColumns = async (req, res) => {
     try {
         const columns = await getColumnsService({
             userId: req.user.id,
-            boardId: req.params.boardId,
+            boardId: Number(req.params.boardId),
         });
 
         return res.status(200).json({
