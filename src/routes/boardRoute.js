@@ -1,9 +1,11 @@
 import express from 'express';
-import { createBoard, editBoard, deleteBoard, archiveBoard, unarchiveBoard, addMembersToBoard, removeMembersFromBoard, editMembersRoleFromBoard } from '../controllers/boardController.js';
+import { getBoard, getBoards, createBoard, editBoard, deleteBoard, archiveBoard, unarchiveBoard, addMembersToBoard, removeMembersFromBoard, editMembersRoleFromBoard } from '../controllers/boardController.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
+router.get("/", authMiddleware, getBoards);
+router.get("/:boardId", authMiddleware, getBoard);
 router.post("/", authMiddleware, createBoard);
 router.patch("/:id", authMiddleware, editBoard);
 router.delete("/:boardId", authMiddleware, deleteBoard);
