@@ -14,7 +14,8 @@ const getCardsService = async ({ userId, columnId }) => {
 
     await checkBoardPermission({
         boardId: column.boardId,
-        userId
+        userId,
+        requiredRole: "VIEW"
     });
 
     return await getCardsRepository(columnId);

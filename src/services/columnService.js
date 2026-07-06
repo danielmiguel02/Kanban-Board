@@ -14,7 +14,8 @@ const getColumnsService = async ({ userId, boardId }) => {
 
     await checkBoardPermission({
         boardId,
-        userId
+        userId,
+        requiredRole: "VIEW"
     });
 
     return await getColumnsRepository(boardId);
