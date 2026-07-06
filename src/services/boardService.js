@@ -10,7 +10,7 @@ const getBoardsService = async (userId) => {
     return boards;
 };
 
-const getBoardService = async ({ boardId, userId }) => {
+const getBoardService = async ({ boardId, ownerId }) => {
 
     if (!boardId)
         throw new Error("Board id is required.");
@@ -20,10 +20,10 @@ const getBoardService = async ({ boardId, userId }) => {
     if (!board)
         throw new Error("Board not found.");
 
-    const isOwner = board.ownerId === userId;
+    const isOwner = board.ownerId === ownerId;
 
     const isMember = board.members.some(
-        member => member.userId === userId
+        member => member.userId === ownerId
     );
 
     if (!isOwner && !isMember)
