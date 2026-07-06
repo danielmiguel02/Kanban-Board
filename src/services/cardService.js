@@ -1,6 +1,25 @@
-import { findCardById, getCardsLastPos, reorderCards, createCard, editCard, deleteCard, moveCardToColumn, archiveCard, unarchiveCard} from "../repositories/cardRepository.js";
+import { getCardsRepository, findCardById, getCardsLastPos, reorderCards, createCard, editCard, deleteCard, moveCardToColumn, archiveCard, unarchiveCard} from "../repositories/cardRepository.js";
 import { findColumnById } from "../repositories/columnRepository.js";
 import { checkBoardPermission } from "./permissionService.js";
+
+const getCardsService = async ({ userId, columnId }) => {
+
+    if (!columnId)
+        throw new Error("ColumnId is required.");
+
+    const column = await findColumnById(columnId);
+
+    if (!column)
+        throw new Error("Column not found.");
+
+    await checkBoardPermission({
+        boardId: column.boardId,
+        userId
+    });
+
+    return await getCardsRepository(columnId);
+
+};
 
 const createCardService = async ({data, columnId, userId}) => {
     const { title } = data;
@@ -236,4 +255,4 @@ const unarchiveCardService = async ({cardId, userId}) => {
     await reorderCards(userId);
 };
 
-export { createCardService, editCardService, deleteCardService, moveCardToColumnService, archiveCardService, unarchiveCardService };
+export { getCardsService, createCardService, editCardService, deleteCardService, moveCardToColumnService, archiveCardService, unarchiveCardService };

@@ -1,4 +1,23 @@
-import { createCardService, editCardService, deleteCardService, moveCardToColumnService, archiveCardService, unarchiveCardService } from "../services/cardService.js";
+import { getCardsService, createCardService, editCardService, deleteCardService, moveCardToColumnService, archiveCardService, unarchiveCardService } from "../services/cardService.js";
+
+const getCards = async (req, res) => {
+    try {
+        const cards = await getCardsService({
+            userId: req.user.id,
+            columnId: req.params.columnId,
+        });
+
+        return res.status(200).json({
+            message: "Cards retrieved successfully",
+            cards,
+        });
+
+    } catch (error) {
+        return res.status(400).json({
+            message: error.message,
+        });
+    }
+};
 
 const createCard = async (req, res) => {
     try {
@@ -159,4 +178,4 @@ const unarchiveCard = async (req, res) => {
     }
 };
 
-export { createCard, editCard, deleteCard, moveCardToColumn, archiveCard, unarchiveCard };
+export { getCards, createCard, editCard, deleteCard, moveCardToColumn, archiveCard, unarchiveCard };
