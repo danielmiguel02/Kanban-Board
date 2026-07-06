@@ -90,3 +90,36 @@ body {
 #sharedBoards .col-lg-3 {
     display: flex;
 }
+
+.columns-wrapper {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    align-items: flex-start;
+    padding-bottom: 10px;
+}
+
+/* EACH COLUMN */
+.kanban-column {
+    min-width: 300px;
+    max-width: 300px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 10px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+/* CARDS */
+.kanban-card {
+    background: white;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 8px;
+    cursor: grab;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.kanban-card:active {
+    cursor: grabbing;
+}
