@@ -1,5 +1,22 @@
 import { prisma } from "../config/db.js";
 
+const getCardsRepository = async (columnId) => {
+
+    return prisma.card.findMany({
+
+        where: {
+            columnId,
+            archived: false
+        },
+
+        orderBy: {
+            position: "asc"
+        }
+
+    });
+
+};
+
 const createCard = async (data) => {
     const { title, position, columnId } = data;
 
@@ -124,4 +141,4 @@ const unarchiveCard = async (data) => {
     });
 };
 
-export { createCard, editCard, deleteCard, moveCardToColumn, getCardsLastPos, findCardById, reorderCards, archiveCard, unarchiveCard };
+export { getCardsRepository, createCard, editCard, deleteCard, moveCardToColumn, getCardsLastPos, findCardById, reorderCards, archiveCard, unarchiveCard };

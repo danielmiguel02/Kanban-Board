@@ -1,5 +1,22 @@
 import { prisma } from "../config/db.js";
 
+const getColumnsRepository = async (boardId) => {
+
+    return prisma.column.findMany({
+
+        where: {
+            boardId,
+            archived: false
+        },
+
+        orderBy: {
+            position: "asc"
+        }
+
+    });
+
+};
+
 const createColumn = async (data) => {
     const { name, position, boardId } = data;
 
@@ -138,4 +155,4 @@ const unarchiveColumn = async (data) => {
     });
 };
 
-export { createColumn, editColumn, deleteColumn, getColumnsLastPos, findColumnById, reorderColumns, archiveColumn, unarchiveColumn };
+export { getColumnsRepository, createColumn, editColumn, deleteColumn, getColumnsLastPos, findColumnById, reorderColumns, archiveColumn, unarchiveColumn };
