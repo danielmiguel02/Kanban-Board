@@ -100,9 +100,13 @@ function renderOwnedBoards(boards) {
 
         ownedBoards.innerHTML = `
             <div class="col-12">
+
                 <div class="alert alert-secondary">
+
                     You don't have any boards yet.
+
                 </div>
+
             </div>
         `;
 
@@ -113,32 +117,24 @@ function renderOwnedBoards(boards) {
     boards.forEach(board => {
 
         ownedBoards.innerHTML += `
-            <div class="col-md-4">
 
-                <div
-                    class="card shadow board-card text-white"
-                    data-id="${board.id}"
-                    onclick="openBoard(${board.id})"
-                    style="
-                        background:${board.color};
-                        cursor:pointer;
-                        min-height:140px;
-                        border:none;
-                    ">
+        <div class="col-lg-3 col-md-4 col-sm-6">
 
-                    <div class="card-body d-flex align-items-end">
+            <div
+                class="board-card shadow-sm"
+                onclick="openBoard(${board.id})"
+                style="background:${board.color};">
 
-                        <h5 class="fw-bold">
+                <span>
 
-                            ${board.name}
+                    ${board.name}
 
-                        </h5>
-
-                    </div>
-
-                </div>
+                </span>
 
             </div>
+
+        </div>
+
         `;
 
     });
@@ -157,9 +153,13 @@ function renderSharedBoards(boards) {
 
         sharedBoards.innerHTML = `
             <div class="col-12">
+
                 <div class="alert alert-secondary">
+
                     No shared boards.
+
                 </div>
+
             </div>
         `;
 
@@ -170,43 +170,36 @@ function renderSharedBoards(boards) {
     boards.forEach(member => {
 
         sharedBoards.innerHTML += `
-            <div class="col-md-4">
 
-                <div
-                    class="card shadow board-card text-white"
-                    onclick="openBoard(${member.board.id})"
-                    style="
-                        background:${member.board.color};
-                        cursor:pointer;
-                        min-height:140px;
-                        border:none;
-                    ">
+        <div class="col-lg-3 col-md-4 col-sm-6">
 
-                    <div class="card-body d-flex flex-column justify-content-end h-100">
+            <div
+                class="board-card shadow-sm"
+                onclick="openBoard(${member.board.id})"
+                style="background:${member.board.color};">
 
-                        <h5 class="fw-bold">
+                <span>
 
-                            ${member.board.name}
+                    ${member.board.name}
 
-                        </h5>
+                </span>
 
-                        <small>
+                <small>
 
-                            Owner: ${member.board.owner.name}
+                    ${member.board.owner.name}
 
-                        </small>
+                </small>
 
-                        <span class="badge bg-light text-dark mt-2 w-auto">
+                <span class="badge bg-light text-dark mt-2">
 
-                            ${member.role}
+                    ${member.role}
 
-                        </span>
-
-                    </div>
-
-                </div>
+                </span>
 
             </div>
+
+        </div>
+
         `;
 
     });
@@ -289,7 +282,7 @@ async function createBoard() {
 
 function openBoard(boardId) {
 
-    window.location.href = `board.html?id=${boardId}`;
+    window.location.href = `/boards/${boardId}`;
 
 }
 
