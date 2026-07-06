@@ -18,6 +18,60 @@ const getBoardsRepository = async (userId) => {
     });
 };
 
+const getBoardRepository = async (boardId) => {
+
+    return prisma.board.findUnique({
+
+        where: {
+            id: Number(boardId),
+        },
+        include: {
+            owner: {
+                select: {
+                    id: true,
+                    name: true,
+                }
+            },
+            members: {
+                select: {
+                    role: true,
+                    userId: true,
+                    user: {
+                        select: {
+                            id: true,
+                            name: true,
+                            email: true,
+                        }
+                    }
+                }
+            },
+            columns: {
+                where: {
+                    archived: false,
+                },
+                orderBy: {
+                    position: "asc",
+                },
+                include: {
+                    cards: {
+                        where: {
+                            archived: false,
+                        },
+                        orderBy: {
+                            position: "asc",
+                        }
+                    }
+
+                }
+
+            }
+
+        }
+
+    });
+
+};
+
 const createBoard = async (data) => {
     const { name, color, ownerId, position } = data;
 
@@ -188,4 +242,4 @@ const unarchiveBoard = async (data) => {
     });
 }
 
-export { getBoardsRepository, createBoard, editBoard, deleteBoard, findBoardById, reorderBoards, getBoardsLastPos, archiveBoard, unarchiveBoard };
+export { getBoardsRepository, getBoardRepository, createBoard, editBoard, deleteBoard, findBoardById, reorderBoards, getBoardsLastPos, archiveBoard, unarchiveBoard };
