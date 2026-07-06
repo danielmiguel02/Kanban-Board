@@ -4,7 +4,7 @@ const getCards = async (req, res) => {
     try {
         const cards = await getCardsService({
             userId: req.user.id,
-            columnId: req.params.columnId,
+            columnId: Number(req.params.columnId),
         });
 
         return res.status(200).json({
