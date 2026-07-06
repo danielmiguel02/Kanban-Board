@@ -1,4 +1,4 @@
-import { getBoardsService, createBoardService, editBoardService, deleteBoardService, archiveBoardService, unarchiveBoardService } from '../services/boardService.js';
+import { getBoardsService, getBoardService, createBoardService, editBoardService, deleteBoardService, archiveBoardService, unarchiveBoardService } from '../services/boardService.js';
 import { getSharedBoardsService, addMembersToBoardService, removeMembersFromBoardService } from '../services/boardMemberService.js';
 
 const getBoards = async (req, res) => {
@@ -25,7 +25,7 @@ const getBoards = async (req, res) => {
 
 const getBoard = async (req, res) => {
     try {
-        const board = await getBoardsService({
+        const board = await getBoardService({
             boardId: req.params.boardId,
             ownerId: req.user.id,
         });
@@ -217,4 +217,4 @@ const removeMembersFromBoard = async (req, res) => {
     }
 };
 
-export { getBoards, createBoard, editBoard, deleteBoard, archiveBoard, unarchiveBoard, addMembersToBoard, removeMembersFromBoard };
+export { getBoards, getBoard, createBoard, editBoard, deleteBoard, archiveBoard, unarchiveBoard, addMembersToBoard, removeMembersFromBoard };
