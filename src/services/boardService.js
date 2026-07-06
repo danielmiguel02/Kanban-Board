@@ -1,4 +1,4 @@
-import { createBoard, editBoard, deleteBoard, findBoardById, reorderBoards, getBoardsLastPos, archiveBoard, unarchiveBoard } from '../repositories/boardRepository.js';
+import { getBoardsRepository, getBoardRepository, createBoard, editBoard, deleteBoard, findBoardById, reorderBoards, getBoardsLastPos, archiveBoard, unarchiveBoard } from '../repositories/boardRepository.js';
 
 const getBoardsService = async (userId) => {
     if (!userId) {
@@ -10,6 +10,28 @@ const getBoardsService = async (userId) => {
     return boards;
 };
 
+const getBoardService = async ({ boardId, userId }) => {
+
+    if (!boardId)
+        throw new Error("Board id is required.");
+
+    const board = await getBoardRepository(boardId);
+
+    if (!board)
+        throw new Error("Board not found.");
+
+    const isOwner = board.ownerId === userId;
+
+    const isMember = board.members.some(
+        member => member.userId === userId
+    );
+
+    if (!isOwner && !isMember)
+        throw new Error("Not authorized.");
+
+    return board;
+};
+ 
 const createBoardService = async ({data, ownerId}) => {
     const { name, color } = data;
 
@@ -141,4 +163,4 @@ const unarchiveBoardService = async ({boardId, userId}) => {
     await reorderBoards(userId);
 };
 
-export { getBoardsService, createBoardService, editBoardService, deleteBoardService, archiveBoardService, unarchiveBoardService };
+export { getBoardsService, getBoardService, createBoardService, editBoardService, deleteBoardService, archiveBoardService, unarchiveBoardService };
