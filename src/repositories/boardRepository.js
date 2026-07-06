@@ -9,6 +9,7 @@ const getBoardsRepository = async (userId) => {
         select: {
             id: true,
             name: true,
+            color: true,
             position: true,
             archived: true,
         },
