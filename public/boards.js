@@ -245,9 +245,7 @@ async function createBoard() {
 ========================= */
 
 function openBoard(boardId) {
-
-    window.location.href = `/boards/${boardId}`;
-
+    window.location.href = `board.html?id=${boardId}`;
 }
 
 /* =========================
