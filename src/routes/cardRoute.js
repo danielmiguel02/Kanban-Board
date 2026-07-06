@@ -1,9 +1,10 @@
 import express from "express";
-import { createCard, editCard, deleteCard, moveCardToColumn, archiveCard, unarchiveCard } from "../controllers/cardController.js";
+import { getCards, createCard, editCard, deleteCard, moveCardToColumn, archiveCard, unarchiveCard } from "../controllers/cardController.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
+router.get("/:columnId", authMiddleware, getCards);
 router.post("/:columnId", authMiddleware, createCard);
 router.patch("/:cardId", authMiddleware, editCard);
 router.delete("/:cardId", authMiddleware, deleteCard);
