@@ -20,6 +20,13 @@ let addColumnModal;
 let addCardModal;
 
 /* =========================
+   DRAG STATE
+========================= */
+
+let draggedCard = null;
+let draggedColumn = null;
+
+/* =========================
    INIT
 ========================= */
 
@@ -30,9 +37,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     addColumnBtn.addEventListener("click", () => addColumnModal.show());
     saveColumnBtn.addEventListener("click", createColumn);
-
     saveCardBtn.addEventListener("click", createCard);
-
     logoutBtn.addEventListener("click", logout);
 
     await loadBoard();
@@ -40,24 +45,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 /* =========================
-   LOAD BOARD INFO
+   LOAD BOARD
 ========================= */
 
 async function loadBoard() {
 
-    try {
+    const res = await fetch(`${API}/boards/${boardId}`, {
+        credentials: "include"
+    });
 
-        const res = await fetch(`${API}/boards/${boardId}`, {
-            credentials: "include"
-        });
-
-        const data = await res.json();
-
-        boardName.textContent = data.board.name;
-
-    } catch (err) {
-        console.error(err);
-    }
+    const data = await res.json();
+    boardName.textContent = data.board.name;
 }
 
 /* =========================
@@ -66,19 +64,13 @@ async function loadBoard() {
 
 async function loadColumns() {
 
-    try {
+    const res = await fetch(`${API}/columns/${boardId}`, {
+        credentials: "include"
+    });
 
-        const res = await fetch(`${API}/columns/${boardId}`, {
-            credentials: "include"
-        });
+    const data = await res.json();
 
-        const data = await res.json();
-
-        renderColumns(data.columns);
-
-    } catch (err) {
-        console.error(err);
-    }
+    renderColumns(data.columns);
 }
 
 /* =========================
@@ -90,35 +82,46 @@ function renderColumns(columns) {
     columnsContainer.innerHTML = "";
 
     if (!columns || columns.length === 0) {
-        columnsContainer.innerHTML = `
-            <div class="text-muted">
-                No columns yet. Create one.
-            </div>
-        `;
+        columnsContainer.innerHTML = `<div class="text-muted">No columns yet</div>`;
         return;
     }
 
     columns.forEach(column => {
 
         const columnEl = document.createElement("div");
-        columnEl.className = "card shadow-sm p-2";
-        columnEl.style.minWidth = "280px";
+        columnEl.className = "kanban-column card";
+
+        columnEl.dataset.id = column.id;
+        columnEl.setAttribute("draggable", true);
 
         columnEl.innerHTML = `
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <strong>${column.name}</strong>
 
-                <button class="btn btn-sm btn-outline-primary">
+                <button class="btn btn-sm btn-outline-primary add-card-btn">
                     + Card
                 </button>
             </div>
 
-            <div id="column-${column.id}" class="d-flex flex-column gap-2">
-                <!-- cards go here -->
-            </div>
+            <div class="kanban-card-list" id="column-${column.id}"></div>
         `;
 
-        const addCardBtn = columnEl.querySelector("button");
+        /* =========================
+           COLUMN DRAG EVENTS
+        ========================= */
+
+        columnEl.addEventListener("dragstart", () => {
+            draggedColumn = columnEl;
+            columnEl.style.opacity = "0.5";
+        });
+
+        columnEl.addEventListener("dragend", async () => {
+            columnEl.style.opacity = "1";
+            draggedColumn = null;
+            await updateColumnPositions();
+        });
+
+        const addCardBtn = columnEl.querySelector(".add-card-btn");
 
         addCardBtn.addEventListener("click", () => {
             activeColumnIdInput.value = column.id;
@@ -137,33 +140,85 @@ function renderColumns(columns) {
 
 async function loadCards(columnId) {
 
-    try {
+    const res = await fetch(`${API}/cards/${columnId}`, {
+        credentials: "include"
+    });
 
-        const res = await fetch(`${API}/cards/${columnId}`, {
+    const data = await res.json();
+
+    const container = document.getElementById(`column-${columnId}`);
+    container.innerHTML = "";
+
+    data.cards.forEach(card => {
+
+        const cardEl = document.createElement("div");
+        cardEl.className = "kanban-card card p-2";
+
+        cardEl.dataset.id = card.id;
+        cardEl.setAttribute("draggable", true);
+
+        cardEl.innerText = card.title;
+
+        /* =========================
+           CARD DRAG EVENTS
+        ========================= */
+
+        cardEl.addEventListener("dragstart", () => {
+            draggedCard = card;
+            cardEl.style.opacity = "0.5";
+        });
+
+        cardEl.addEventListener("dragend", () => {
+            draggedCard = null;
+            cardEl.style.opacity = "1";
+        });
+
+        container.appendChild(cardEl);
+    });
+
+    /* allow drop */
+    container.addEventListener("dragover", (e) => e.preventDefault());
+
+    container.addEventListener("drop", async () => {
+
+        if (!draggedCard) return;
+
+        const targetColumnId = columnId;
+
+        await fetch(`${API}/cards/${draggedCard.id}/move/${targetColumnId}`, {
+            method: "PATCH",
             credentials: "include"
         });
 
-        const data = await res.json();
+        await loadColumns();
+    });
+}
 
-        const container = document.getElementById(`column-${columnId}`);
+/* =========================
+   UPDATE COLUMN POSITIONS
+========================= */
 
-        container.innerHTML = "";
+async function updateColumnPositions() {
 
-        data.cards.forEach(card => {
+    const cols = [...document.querySelectorAll(".kanban-column")];
 
-            const cardEl = document.createElement("div");
-            cardEl.className = "card p-2";
+    for (let i = 0; i < cols.length; i++) {
 
-            cardEl.innerHTML = `
-                ${card.title}
-            `;
+        const id = cols[i].dataset.id;
 
-            container.appendChild(cardEl);
+        await fetch(`${API}/columns/${id}`, {
+            method: "PATCH",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                position: i
+            })
         });
-
-    } catch (err) {
-        console.error(err);
     }
+
+    await loadColumns();
 }
 
 /* =========================
@@ -173,28 +228,21 @@ async function loadCards(columnId) {
 async function createColumn() {
 
     const name = columnNameInput.value.trim();
-
     if (!name) return;
 
-    try {
+    await fetch(`${API}/columns/${boardId}`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name })
+    });
 
-        await fetch(`${API}/columns/${boardId}`, {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ name })
-        });
+    columnNameInput.value = "";
+    addColumnModal.hide();
 
-        columnNameInput.value = "";
-        addColumnModal.hide();
-
-        await loadColumns();
-
-    } catch (err) {
-        console.error(err);
-    }
+    await loadColumns();
 }
 
 /* =========================
@@ -208,25 +256,19 @@ async function createCard() {
 
     if (!title || !columnId) return;
 
-    try {
+    await fetch(`${API}/cards/${columnId}`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ title })
+    });
 
-        await fetch(`${API}/cards/${columnId}`, {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ title })
-        });
+    cardTitleInput.value = "";
+    addCardModal.hide();
 
-        cardTitleInput.value = "";
-        addCardModal.hide();
-
-        await loadCards(columnId);
-
-    } catch (err) {
-        console.error(err);
-    }
+    await loadCards(columnId);
 }
 
 /* =========================
@@ -235,16 +277,10 @@ async function createCard() {
 
 async function logout() {
 
-    try {
+    await fetch(`${API}/auth/logout`, {
+        method: "POST",
+        credentials: "include"
+    });
 
-        await fetch(`${API}/auth/logout`, {
-            method: "POST",
-            credentials: "include"
-        });
-
-        window.location.href = "index.html";
-
-    } catch (err) {
-        console.error(err);
-    }
+    window.location.href = "index.html";
 }
