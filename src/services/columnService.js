@@ -1,6 +1,25 @@
-import { getColumnsLastPos, findColumnById, reorderColumns, createColumn, editColumn, deleteColumn, archiveColumn, unarchiveColumn } from "../repositories/columnRepository.js";
+import { getColumnsRepository, getColumnsLastPos, findColumnById, reorderColumns, createColumn, editColumn, deleteColumn, archiveColumn, unarchiveColumn } from "../repositories/columnRepository.js";
 import { findBoardById } from "../repositories/boardRepository.js";
 import { checkBoardPermission } from "./permissionService.js";
+
+const getColumnsService = async ({ userId, boardId }) => {
+
+    if (!boardId)
+        throw new Error("BoardId is required.");
+
+    const board = await findBoardById(boardId);
+
+    if (!board)
+        throw new Error("Board not found.");
+
+    await checkBoardPermission({
+        boardId,
+        userId
+    });
+
+    return await getColumnsRepository(boardId);
+
+};
 
 const createColumnService = async ({data, boardId, userId}) => {
     const { name } = data;
@@ -186,4 +205,4 @@ const unarchiveColumnService = async ({columnId, userId}) => {
     await reorderColumns(userId);
 };
 
-export { createColumnService, editColumnService, deleteColumnService, archiveColumnService, unarchiveColumnService };
+export { getColumnsService, createColumnService, editColumnService, deleteColumnService, archiveColumnService, unarchiveColumnService };
