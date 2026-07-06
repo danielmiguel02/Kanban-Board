@@ -96,49 +96,35 @@ function renderOwnedBoards(boards) {
 
     ownedBoards.innerHTML = "";
 
-    if (boards.length === 0) {
-
+    if (!boards || boards.length === 0) {
         ownedBoards.innerHTML = `
             <div class="col-12">
-
                 <div class="alert alert-secondary">
-
                     You don't have any boards yet.
-
                 </div>
-
             </div>
         `;
-
         return;
-
     }
 
     boards.forEach(board => {
 
-        ownedBoards.innerHTML += `
+        const col = document.createElement("div");
+        col.className = "col-lg-3 col-md-4 col-sm-6";
 
-        <div class="col-lg-3 col-md-4 col-sm-6">
+        const card = document.createElement("div");
+        card.className = "board-card shadow-sm";
+        card.style.background = board.color;
 
-            <div
-                class="board-card shadow-sm"
-                onclick="openBoard(${board.id})"
-                style="background:${board.color};">
-
-                <span>
-
-                    ${board.name}
-
-                </span>
-
-            </div>
-
-        </div>
-
+        card.innerHTML = `
+            <span>${board.name}</span>
         `;
 
-    });
+        card.addEventListener("click", () => openBoard(board.id));
 
+        col.appendChild(card);
+        ownedBoards.appendChild(col);
+    });
 }
 
 /* =========================
@@ -149,61 +135,39 @@ function renderSharedBoards(boards) {
 
     sharedBoards.innerHTML = "";
 
-    if (boards.length === 0) {
-
+    if (!boards || boards.length === 0) {
         sharedBoards.innerHTML = `
             <div class="col-12">
-
                 <div class="alert alert-secondary">
-
                     No shared boards.
-
                 </div>
-
             </div>
         `;
-
         return;
-
     }
 
     boards.forEach(member => {
 
-        sharedBoards.innerHTML += `
+        const col = document.createElement("div");
+        col.className = "col-lg-3 col-md-4 col-sm-6";
 
-        <div class="col-lg-3 col-md-4 col-sm-6">
+        const card = document.createElement("div");
+        card.className = "board-card shadow-sm";
+        card.style.background = member.board.color;
 
-            <div
-                class="board-card shadow-sm"
-                onclick="openBoard(${member.board.id})"
-                style="background:${member.board.color};">
-
-                <span>
-
-                    ${member.board.name}
-
-                </span>
-
-                <small>
-
-                    ${member.board.owner.name}
-
-                </small>
-
-                <span class="badge bg-light text-dark mt-2">
-
-                    ${member.role}
-
-                </span>
-
-            </div>
-
-        </div>
-
+        card.innerHTML = `
+            <span>${member.board.name}</span>
+            <small>${member.board.owner.name}</small>
+            <span class="badge bg-light text-dark mt-2">
+                ${member.role}
+            </span>
         `;
 
-    });
+        card.addEventListener("click", () => openBoard(member.board.id));
 
+        col.appendChild(card);
+        sharedBoards.appendChild(col);
+    });
 }
 
 /* =========================

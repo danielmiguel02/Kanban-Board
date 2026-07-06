@@ -1,0 +1,92 @@
+/* =========================
+   PAGE BACKGROUND
+========================= */
+
+body {
+    background: #f4f6fb;
+}
+
+/* =========================
+   BOARD CARD
+========================= */
+
+.board-card {
+    position: relative;
+    height: 120px;
+    border-radius: 12px;
+    padding: 12px;
+
+    color: white;
+    font-weight: 600;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    cursor: pointer;
+
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    overflow: hidden;
+}
+
+/* hover effect */
+.board-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* subtle dark overlay for readability */
+.board-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.15);
+}
+
+/* keep text above overlay */
+.board-card span,
+.board-card small,
+.board-card .badge {
+    position: relative;
+    z-index: 2;
+}
+
+/* owner text */
+.board-card small {
+    font-size: 12px;
+    opacity: 0.85;
+}
+
+/* role badge */
+.board-card .badge {
+    width: fit-content;
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 999px;
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
+
+.alert {
+    border-radius: 10px;
+}
+
+/* =========================
+   BUTTON POLISH
+========================= */
+
+#createBoardBtn {
+    border-radius: 10px;
+    padding: 8px 14px;
+}
+
+/* =========================
+   GRID SPACING FIX
+========================= */
+
+#ownedBoards .col-lg-3,
+#sharedBoards .col-lg-3 {
+    display: flex;
+}
