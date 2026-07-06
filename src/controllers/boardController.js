@@ -23,6 +23,24 @@ const getBoards = async (req, res) => {
     }
 };
 
+const getBoard = async (req, res) => {
+    try {
+        const board = await getBoardsService({
+            boardId: req.params.boardId,
+            ownerId: req.user.id,
+        });
+
+        return res.status(200).json({
+            message: "Board retrieved successfully",
+            board,
+        });
+    } catch (error) {
+        return res.status(400).json({
+            message: error.message,
+        });
+    }
+};
+
 const createBoard = async (req, res) => {
     try {
         const result = await createBoardService({
