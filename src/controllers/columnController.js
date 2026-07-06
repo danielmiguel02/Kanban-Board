@@ -1,4 +1,22 @@
-import { createColumnService, editColumnService, deleteColumnService, archiveColumnService, unarchiveColumnService } from '../services/columnService.js';
+import { getColumnsService, createColumnService, editColumnService, deleteColumnService, archiveColumnService, unarchiveColumnService } from '../services/columnService.js';
+
+const getColumns = async (req, res) => {
+    try {
+        const columns = await getColumnsService({
+            userId: req.user.id,
+            boardId: req.params.boardId,
+        });
+
+        return res.status(200).json({
+            message: "Columns retrieved successfully",
+            columns,
+        });
+    } catch (error) {
+        return res.status(400).json({
+            message: error.message,
+        });
+    }
+};
 
 const createColumn = async (req, res) => {
     try {
@@ -133,4 +151,4 @@ const unarchiveColumn = async (req, res) => {
     }
 };
 
-export { createColumn, editColumn, deleteColumn, archiveColumn, unarchiveColumn };
+export { getColumns, createColumn, editColumn, deleteColumn, archiveColumn, unarchiveColumn };
