@@ -75,32 +75,47 @@ const findColumnById = async (columnId) => {
     });
 };
 
-const reorderColumns = async (userId) => {
+const reorderColumns = async (boardId) => {
     return prisma.$transaction(async (tx) => {
+
         const columns = await tx.column.findMany({
             where: {
+                boardId,
                 archived: false,
-                board: {
-                    ownerId: userId,
-                },
             },
             orderBy: {
-                position: 'asc',
+                position: "asc",
             },
         });
 
         for (let i = 0; i < columns.length; i++) {
+
             if (columns[i].position !== i + 1) {
+
                 await tx.column.update({
                     where: {
-                        id: columns[i].id
+                        id: columns[i].id,
                     },
                     data: {
-                        position: i + 1
+                        position: i + 1,
                     },
                 });
+
             }
+
         }
+
+    });
+};
+
+const moveColumnRepository = async ({ columnId, position }) => {
+    return prisma.column.update({
+        where: {
+            id: columnId,
+        },
+        data: {
+            position,
+        },
     });
 };
 
@@ -155,4 +170,4 @@ const unarchiveColumn = async (data) => {
     });
 };
 
-export { getColumnsRepository, createColumn, editColumn, deleteColumn, getColumnsLastPos, findColumnById, reorderColumns, archiveColumn, unarchiveColumn };
+export { getColumnsRepository, createColumn, editColumn, deleteColumn, getColumnsLastPos, findColumnById, reorderColumns, moveColumnRepository, archiveColumn, unarchiveColumn };
