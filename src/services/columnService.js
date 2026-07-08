@@ -135,7 +135,7 @@ const deleteColumnService = async ({columnId, userId}) => {
         columnId
     });
 
-    await reorderColumns(userId);
+    await reorderColumns(column.boardId);
 };
 
 const moveColumnService = async ({ columnId, position, userId }) => {
@@ -193,7 +193,7 @@ const archiveColumnService = async ({columnId, userId}) => {
         columnId
     });
 
-    await reorderColumns(userId);
+    await reorderColumns(column.boardId);
 };
 
 const unarchiveColumnService = async ({columnId, userId}) => {
@@ -227,7 +227,7 @@ const unarchiveColumnService = async ({columnId, userId}) => {
         columnId
     });
 
-    await reorderColumns(userId);
+    await reorderColumns(column.boardId);
 };
 
 export { getColumnsService, createColumnService, editColumnService, deleteColumnService, moveColumnService, archiveColumnService, unarchiveColumnService };
