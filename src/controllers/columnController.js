@@ -1,10 +1,10 @@
-import { getColumnsService, createColumnService, editColumnService, deleteColumnService, archiveColumnService, unarchiveColumnService } from '../services/columnService.js';
+import { getColumnsService, createColumnService, editColumnService, deleteColumnService, moveColumnService, archiveColumnService, unarchiveColumnService } from '../services/columnService.js';
 
 const getColumns = async (req, res) => {
     try {
         const columns = await getColumnsService({
             userId: req.user.id,
-            boardId: req.params.boardId,
+            boardId: Number(req.params.boardId),
         });
 
         return res.status(200).json({
@@ -99,6 +99,29 @@ const deleteColumn = async (req, res) => {
     }
 };
 
+const moveColumn = async (req, res) => {
+    try {
+
+        const result = await moveColumnService({
+            columnId: req.params.columnId,
+            position: req.body.position,
+            userId: req.user.id,
+        });
+
+        return res.status(200).json({
+            message: "Column moved successfully",
+            column: result,
+        });
+
+    } catch (error) {
+
+        return res.status(400).json({
+            message: error.message,
+        });
+
+    }
+};
+
 const archiveColumn = async (req, res) => {
     try {
         const columnId = Number(req.params.columnId);
@@ -151,4 +174,4 @@ const unarchiveColumn = async (req, res) => {
     }
 };
 
-export { getColumns, createColumn, editColumn, deleteColumn, archiveColumn, unarchiveColumn };
+export { getColumns, createColumn, editColumn, deleteColumn, moveColumn, archiveColumn, unarchiveColumn };

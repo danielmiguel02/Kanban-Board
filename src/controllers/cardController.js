@@ -4,7 +4,7 @@ const getCards = async (req, res) => {
     try {
         const cards = await getCardsService({
             userId: req.user.id,
-            columnId: req.params.columnId,
+            columnId: Number(req.params.columnId),
         });
 
         return res.status(200).json({
@@ -100,29 +100,35 @@ const deleteCard = async (req, res) => {
 
 const moveCardToColumn = async (req, res) => {
     try {
-        const cardId = Number(req.params.cardId);
-        const columnId = Number(req.params.columnId);
 
-        if (isNaN(cardId) || isNaN(columnId)) {
+        const { cardId, columnId } = req.params;
+
+        const parsedCardId = Number(cardId);
+        const parsedColumnId = Number(columnId);
+
+        if (isNaN(parsedCardId) || isNaN(parsedColumnId)) {
             return res.status(400).json({
-                message: "Invalid card or column ID"
+                message: "Invalid card or column ID."
             });
         }
 
-        const result = await moveCardToColumnService({
-            cardId: cardId,
-            columnId: columnId,
+        const movedCard = await moveCardToColumnService({
+            cardId: parsedCardId,
+            columnId: parsedColumnId,
             userId: req.user.id,
         });
 
         return res.status(200).json({
             message: "Card moved successfully",
-            card: result
+            card: movedCard,
         });
+
     } catch (error) {
+
         return res.status(400).json({
             message: error.message,
         });
+
     }
 };
 
