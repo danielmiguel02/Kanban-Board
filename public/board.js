@@ -86,52 +86,112 @@ function renderColumns(columns) {
         return;
     }
 
+
     columns.forEach(column => {
 
         const columnEl = document.createElement("div");
-        columnEl.className = "kanban-column card";
 
+        columnEl.className = "kanban-column card";
         columnEl.dataset.id = column.id;
-        columnEl.setAttribute("draggable", true);
+        columnEl.draggable = true;
+
 
         columnEl.innerHTML = `
             <div class="d-flex justify-content-between align-items-center mb-2">
+
                 <strong>${column.name}</strong>
 
                 <button class="btn btn-sm btn-outline-primary add-card-btn">
                     + Card
                 </button>
+
             </div>
+
 
             <div class="kanban-card-list" id="column-${column.id}"></div>
         `;
 
-        /* =========================
-           COLUMN DRAG EVENTS
-        ========================= */
+
+
+        /*
+            COLUMN DRAG
+        */
 
         columnEl.addEventListener("dragstart", () => {
+
             draggedColumn = columnEl;
+
             columnEl.style.opacity = "0.5";
+
         });
+
+
 
         columnEl.addEventListener("dragend", async () => {
+
             columnEl.style.opacity = "1";
+
             draggedColumn = null;
+
             await updateColumnPositions();
+
         });
 
-        const addCardBtn = columnEl.querySelector(".add-card-btn");
+
+
+        columnEl.addEventListener("dragover", e => {
+
+            e.preventDefault();
+
+        });
+
+
+
+        columnEl.addEventListener("drop", e => {
+
+            e.preventDefault();
+
+
+            if (!draggedColumn || draggedColumn === columnEl)
+                return;
+
+
+            const rect = columnEl.getBoundingClientRect();
+
+            const next =
+                e.clientX < rect.left + rect.width / 2;
+
+
+            columnsContainer.insertBefore(
+                draggedColumn,
+                next ? columnEl : columnEl.nextSibling
+            );
+
+        });
+
+
+
+        const addCardBtn =
+            columnEl.querySelector(".add-card-btn");
+
 
         addCardBtn.addEventListener("click", () => {
+
             activeColumnIdInput.value = column.id;
+
             addCardModal.show();
+
         });
+
+
 
         columnsContainer.appendChild(columnEl);
 
-        loadCards(column.id);
     });
+
+
+    loadAllCards(columns);
+
 }
 
 /* =========================
@@ -140,58 +200,128 @@ function renderColumns(columns) {
 
 async function loadCards(columnId) {
 
+
     const res = await fetch(`${API}/cards/${columnId}`, {
         credentials: "include"
     });
 
+
     const data = await res.json();
 
-    const container = document.getElementById(`column-${columnId}`);
+
+    const container =
+        document.getElementById(`column-${columnId}`);
+
+
     container.innerHTML = "";
+
 
     data.cards.forEach(card => {
 
+
         const cardEl = document.createElement("div");
-        cardEl.className = "kanban-card card p-2";
+
+
+        cardEl.className =
+            "kanban-card card p-2 mb-2";
+
 
         cardEl.dataset.id = card.id;
-        cardEl.setAttribute("draggable", true);
+
+
+        cardEl.draggable = true;
+
 
         cardEl.innerText = card.title;
 
-        /* =========================
-           CARD DRAG EVENTS
-        ========================= */
+
+
+        /*
+            CARD DRAG
+        */
+
 
         cardEl.addEventListener("dragstart", () => {
-            draggedCard = card;
+
+
+            draggedCard = cardEl;
+
+
             cardEl.style.opacity = "0.5";
+
         });
 
-        cardEl.addEventListener("dragend", () => {
-            draggedCard = null;
+
+
+        cardEl.addEventListener("dragend", async () => {
+
+
             cardEl.style.opacity = "1";
+
+
+            draggedCard = null;
+
         });
+
+
 
         container.appendChild(cardEl);
+
+
     });
 
-    /* allow drop */
-    container.addEventListener("dragover", (e) => e.preventDefault());
 
-    container.addEventListener("drop", async () => {
 
-        if (!draggedCard) return;
+    container.addEventListener("dragover", e => {
 
-        const targetColumnId = columnId;
+        e.preventDefault();
 
-        await fetch(`${API}/cards/${draggedCard.id}/move/${targetColumnId}`, {
-            method: "PATCH",
-            credentials: "include"
-        });
+    });
+
+
+
+    container.addEventListener("drop", async e => {
+
+
+        e.preventDefault();
+
+
+        if (!draggedCard)
+            return;
+
+
+
+        const cardId =
+            draggedCard.dataset.id;
+
+
+
+        await fetch(
+            `${API}/cards/${cardId}/move/${columnId}`,
+            {
+                method:"PATCH",
+                credentials:"include"
+            }
+        );
+
 
         await loadColumns();
+
+
     });
+
+}
+
+/* =========================
+   LOAD ALL CARDS
+========================= */
+
+async function loadAllCards(columns) {
+
+    await Promise.all(
+        columns.map(column => loadCards(column.id))
+    );
+
 }
 
 /* =========================
@@ -200,25 +330,44 @@ async function loadCards(columnId) {
 
 async function updateColumnPositions() {
 
-    const cols = [...document.querySelectorAll(".kanban-column")];
 
-    for (let i = 0; i < cols.length; i++) {
+    const cols =
+        [...document.querySelectorAll(".kanban-column")];
 
-        const id = cols[i].dataset.id;
 
-        await fetch(`${API}/columns/${id}`, {
-            method: "PATCH",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                position: i
-            })
-        });
-    }
+
+    const positions =
+        cols.map((col,index)=>({
+
+            id: col.dataset.id,
+
+            position:index
+
+        }));
+
+
+
+    await fetch(`${API}/columns/reorder`, {
+
+        method:"PATCH",
+
+        credentials:"include",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+
+        body:JSON.stringify({
+            columns:positions
+        })
+
+    });
+
+
 
     await loadColumns();
+
 }
 
 /* =========================
