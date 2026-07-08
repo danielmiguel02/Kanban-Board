@@ -1,0 +1,141 @@
+# KANBAN-BOARD API
+
+A RESTful backend API for a Kanban-style task management system (similar to Trello or ClickUp).
+Supports user authentication, boards, columns, and cards with full CRUD functionality.
+Project is built in Node.js and Express, used Prisma with Neon for database.
+
+
+## NOTES
+- Make sure .env is setup properly.
+- I set up PORT to be 9000/9001 but it can be changed to any PORT by changing inside .env or server.js.
+- All board, column, and card routes require a valid JWT token sent via the Authorization header.
+- Users can only access and modify boards, columns, and cards they own.
+- If you delete/archive boards/columns it will delete/archive associated with columns/cards.
+
+## Tech Stack
+- Node.js
+- Express.js
+- Prisma
+- Prisma Client
+- bcryptjs
+- dotenv
+- nodemon
+- jsonwebtoken
+
+## Features
+- User authentication with JWT
+- Create and manage boards/columns/cards
+- Columns within boards
+- Cards within columns
+- Move cards between columns
+- Secure routes with ownership checks
+- Board, column, and card positions are automatically updated when creating/deleting/moving.
+- Archive boards, columns, cards.
+
+
+## API Endpoints
+
+AUTH ROUTES
+METHOD       ROUTES                     DESCRIPTION
+-----------------------------------------------------------------------------
+POST         /auth/register             Registers a user.
+POST         /auth/login                Logs in a user.
+POST         /auth/logout               Logs out a user. (Client-side logout (JWT token removal))
+
+BOARD ROUTES
+METHOD       ROUTES                     DESCRIPTION
+-----------------------------------------------------------------------------
+POST         /boards/                   Creates a new board.
+PATCH        /boards/:boardId           Edit board name.
+PATCH        /boards/:boardId/archive   Archives board. (This will archive all columns/cards associated with board.)
+DELETE       /boards/:boardId           Deletes board. (This will delete all columns/cards associated with board.)
+
+COLUMN ROUTES
+METHOD       ROUTES                     DESCRIPTION
+-----------------------------------------------------------------------------
+POST         /columns/:boardId          Creates a new column on the board.
+PATCH        /columns/:columnId         Edit column name.
+PATCH        /columns/:columnId/archive Archives column. (This will archive all cards associated with column.)
+DELETE       /columns/:columnId         Deletes column. (This will delete all cards associated with column.)
+
+CARD ROUTES
+METHOD       ROUTES                     DESCRIPTION
+-----------------------------------------------------------------------------
+POST         /cards/:columnId           Creates a new card on the column.
+PATCH        /cards/:cardId             Edit card title.
+PATCH        /cards/:cardId/:columnId   Updates card columnId. (This works when you move one card to another column.)
+PATCH        /cards/:cardId/archive     Archives card.
+DELETE       /cards/:cardId             Deletes card.
+
+
+## Project Setup
+
+- Clone the repository
+    git clone https://github.com/danielmiguel02/KANBAN-BOARD.git
+    cd KANBAN-BOARD
+
+- Install Dependencies
+    npm i
+
+- Environment Variables
+    Create a .env file in the root of the project and add the required credentials:
+    DATABASE_URL="" // Inside Neon you will be able to grab the url.
+    PORT=9000 // Or change it to what you would like to be the PORT.
+    NODE_ENV="development"
+    JWT_SECRET="" // node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+    JWT_EXPIRES_IN="7d"
+
+- Running the project
+    npm run dev
+
+- Authorization
+    Authorization: Bearer <your_token_here>
+
+
+## POST Example
+
+AUTH REGISTER (http://localhost:9000/auth/register)
+{
+    "name": "Josh",
+    "email": "emailtoregister@gmail.com",
+    "password": "password123"
+}
+
+AUTH LOGIN (http://localhost:9000/auth/login)
+{
+    "email": "emailtoregister@gmail.com",
+    "password": "password123"
+}
+
+BOARD CREATE (http://localhost:9000/boards/)
+{
+    "name": "board name here"
+}
+
+BOARD EDIT (http://localhost:9000/boards/:boardId)
+{
+    "name": "board edited name"
+}
+
+COLUMN CREATE (http://localhost:9000/columns/:boardId)
+{
+    "name": "new column"
+}
+
+COLUMN EDIT (http://localhost:9000/columns/:columnId)
+{
+    "name": "column edited name"
+}
+
+CARD CREATE (http://localhost:9000/cards/:columnId)
+{
+    "title": "new card"
+}
+
+CARD EDIT (http://localhost:9000/cards/:cardId)
+{
+    "title": "card edited title"
+}
+
+Author
+Daniel Miguel

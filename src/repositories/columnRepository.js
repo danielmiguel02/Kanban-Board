@@ -46,17 +46,14 @@ const deleteColumn = async (data) => {
 const getColumnsLastPos = async (boardId) => {
     return prisma.column.aggregate({
         _max: { position: true },
-        where: { boardId: boardId }
+        where: { boardId: boardId, archived: false }
     });
 };
 
-const findOwnedColumn = async (columnId, userId) => {
-    return prisma.column.findFirst({
+const findColumnById = async (columnId) => {
+    return prisma.column.findUnique({
         where: {
             id: columnId,
-            board: {
-                ownerId: userId,
-            },
         },
     });
 };
@@ -65,6 +62,7 @@ const reorderColumns = async (userId) => {
     return prisma.$transaction(async (tx) => {
         const columns = await tx.column.findMany({
             where: {
+                archived: false,
                 board: {
                     ownerId: userId,
                 },
@@ -89,4 +87,55 @@ const reorderColumns = async (userId) => {
     });
 };
 
-export { createColumn, editColumn, deleteColumn, getColumnsLastPos, findOwnedColumn, reorderColumns };
+const archiveColumn = async (data) => {
+    const { columnId } = data;
+
+    return prisma.$transaction(async (tx) => {
+        await tx.card.updateMany({
+            where: {
+                columnId,
+                archived: false,
+            },
+            data: {
+                archived: true,
+            },
+        });
+
+        await tx.column.update({
+            where: {
+                id: columnId,
+            },
+            data: {
+                archived: true,
+            },
+        });
+    });
+};
+
+const unarchiveColumn = async (data) => {
+    const { columnId } = data;
+
+    return prisma.$transaction(async (tx) => {
+
+        await tx.card.updateMany({
+            where: {
+                columnId,
+                archived: true,
+            },
+            data: {
+                archived: false,
+            },
+        });
+        
+        await tx.column.update({
+            where: {
+                id: columnId,
+            },
+            data: {
+                archived: false,
+            },
+        });
+    });
+};
+
+export { createColumn, editColumn, deleteColumn, getColumnsLastPos, findColumnById, reorderColumns, archiveColumn, unarchiveColumn };

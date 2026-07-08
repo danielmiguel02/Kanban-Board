@@ -1,5 +1,26 @@
-import { getColumnsLastPos, findOwnedColumn, reorderColumns, createColumn, editColumn, deleteColumn } from "../repositories/columnRepository.js";
-import { findOwnedBoard } from "../repositories/boardRepository.js";
+import { getColumnsRepository, getColumnsLastPos, findColumnById, reorderColumns, createColumn, editColumn, deleteColumn, moveColumnRepository, archiveColumn, unarchiveColumn } from "../repositories/columnRepository.js";
+import { findBoardById } from "../repositories/boardRepository.js";
+import { checkBoardPermission } from "./permissionService.js";
+
+const getColumnsService = async ({ userId, boardId }) => {
+
+    if (!boardId)
+        throw new Error("BoardId is required.");
+
+    const board = await findBoardById(boardId);
+
+    if (!board)
+        throw new Error("Board not found.");
+
+    await checkBoardPermission({
+        boardId,
+        userId,
+        requiredRole: "VIEW"
+    });
+
+    return await getColumnsRepository(boardId);
+
+};
 
 const createColumnService = async ({data, boardId, userId}) => {
     const { name } = data;
@@ -8,10 +29,20 @@ const createColumnService = async ({data, boardId, userId}) => {
         throw new Error("Name is required to create a column.");
     }
 
-    const board = await findOwnedBoard(boardId, userId);
+    const board = await findBoardById(boardId);
 
     if (!board) {
-        throw new Error("Board not found or not authorized");
+        throw new Error("Board not found");
+    }
+
+    await checkBoardPermission({
+        boardId: boardId,
+        userId,
+        requiredRole: "EDIT",
+    });
+
+    if (board.archived) {
+        throw new Error("Column board is archived, can't create column");
     }
 
     const columnsLastPosResult = await getColumnsLastPos(boardId);
@@ -42,10 +73,26 @@ const editColumnService = async ({data, columnId, userId}) => {
         throw new Error("Name is required to edit a column");
     }
 
-    const column = await findOwnedColumn(columnId, userId);
+    const column = await findColumnById(columnId);
 
     if (!column) {
-        throw new Error("Column not found or not authorized");
+        throw new Error("Column not found");
+    }
+
+    const board = await findBoardById(column.boardId);
+
+    if (!board) {
+        throw new Error("Board not found");
+    }
+
+    await checkBoardPermission({
+        boardId: board.id,
+        userId,
+        requiredRole: "EDIT",
+    });
+
+    if (column.archived) {
+        throw new Error("Can't edit archived column");
     }
 
     const editedColumn = await editColumn({
@@ -66,11 +113,23 @@ const editColumnService = async ({data, columnId, userId}) => {
 };
 
 const deleteColumnService = async ({columnId, userId}) => {
-    const column = await findOwnedColumn(columnId, userId);
+    const column = await findColumnById(columnId);
 
     if (!column) {
-        throw new Error("Column not found or not authorized");
+        throw new Error("Column not found");
     }
+
+    const board = await findBoardById(column.boardId);
+
+    if (!board) {
+        throw new Error("Board not found");
+    }
+
+    await checkBoardPermission({
+        boardId: board.id,
+        userId,
+        requiredRole: "EDIT",
+    });
 
     await deleteColumn({
         columnId
@@ -79,4 +138,96 @@ const deleteColumnService = async ({columnId, userId}) => {
     await reorderColumns(userId);
 };
 
-export { createColumnService, editColumnService, deleteColumnService };
+const moveColumnService = async ({ columnId, position, userId }) => {
+
+    const column = await findColumnById(columnId);
+
+    if (!column) {
+        throw new Error("Column not found.");
+    }
+
+    await checkBoardPermission({
+        boardId: column.boardId,
+        userId,
+        requiredRole: "EDIT",
+    });
+
+    const movedColumn = await moveColumnRepository({
+        columnId,
+        position,
+    });
+
+    await reorderColumns(column.boardId);
+
+    return movedColumn;
+};
+
+const archiveColumnService = async ({columnId, userId}) => {
+    const column = await findColumnById(columnId);
+
+    if (!column) {
+        throw new Error("Column not found");
+    }
+
+    const board = await findBoardById(column.boardId);
+
+    if (!board) {
+        throw new Error("Board not found");
+    }
+
+    await checkBoardPermission({
+        boardId: board.id,
+        userId,
+        requiredRole: "EDIT",
+    });
+
+    if (column.archived) {
+        throw new Error("Column is already archived, can't archive");
+    }
+
+    if (board.archived) {
+        throw new Error("Column board is archived, can't archive column");
+    }
+
+    await archiveColumn({
+        columnId
+    });
+
+    await reorderColumns(userId);
+};
+
+const unarchiveColumnService = async ({columnId, userId}) => {
+    const column = await findColumnById(columnId);
+
+    if (!column) {
+        throw new Error("Column not found");
+    }
+
+    const board = await findBoardById(column.boardId);
+
+    if (!board) {
+        throw new Error("Board not found");
+    }
+
+    await checkBoardPermission({
+        boardId: board.id,
+        userId,
+        requiredRole: "EDIT",
+    });
+
+    if (!column.archived) {
+        throw new Error("Column is not archived, can't unarchive");
+    }
+
+    if (board.archived) {
+        throw new Error("Board is archived, can't unarchive column");
+    }
+
+    await unarchiveColumn({
+        columnId
+    });
+
+    await reorderColumns(userId);
+};
+
+export { getColumnsService, createColumnService, editColumnService, deleteColumnService, moveColumnService, archiveColumnService, unarchiveColumnService };

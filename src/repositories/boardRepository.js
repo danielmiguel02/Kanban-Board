@@ -1,5 +1,23 @@
 import { prisma } from "../config/db.js";
 
+const getBoardsRepository = async (userId) => {
+    return prisma.board.findMany({
+        where: {
+            ownerId: userId,
+            archived: false,
+        },
+        select: {
+            id: true,
+            name: true,
+            position: true,
+            archived: true,
+        },
+        orderBy: {
+            position: "asc",
+        },
+    });
+};
+
 const createBoard = async (data) => {
     const { name, ownerId, position } = data;
 
@@ -60,19 +78,10 @@ const findBoardById = async (id) => {
     });
 };
 
-const findOwnedBoard = async (boardId, userId) => {
-    return prisma.board.findFirst({
-        where: {
-            id: boardId,
-            ownerId: userId,
-        },
-    });
-};
-
 const getBoardsLastPos = async (userId) => {
     return prisma.board.aggregate({
         _max: { position: true },
-        where: { ownerId: userId },
+        where: { ownerId: userId, archived: false },
     });
 };
 
@@ -81,6 +90,7 @@ const reorderBoards = async (userId) => {
         const boards = await tx.board.findMany({
             where: { 
                 ownerId: userId,
+                archived: false,
             },
             orderBy: {
                 position: 'asc',
@@ -102,4 +112,78 @@ const reorderBoards = async (userId) => {
     });
 };
 
-export { createBoard, editBoard, deleteBoard, findBoardById, findOwnedBoard, reorderBoards, getBoardsLastPos };
+const archiveBoard = async (data) => {
+    const { boardId } = data;
+
+    return prisma.$transaction(async (tx) => {
+        await tx.card.updateMany({
+            where: {
+                column: {
+                    boardId,
+                },
+                archived: false,
+            },
+            data: {
+                archived: true,
+            },
+        });
+
+        await tx.column.updateMany({
+            where: {
+                boardId,
+                archived: false,
+            },
+            data: {
+                archived: true,
+            },
+        });
+
+        await tx.board.update({
+            where: {
+                id: boardId,
+            },
+            data: {
+                archived: true,
+            },
+        });
+    });
+};
+
+const unarchiveBoard = async (data) => {
+    const { boardId } = data;
+
+    return prisma.$transaction(async (tx) => {
+        await tx.card.updateMany({
+            where: {
+                column: {
+                    boardId,
+                },
+                archived: true,
+            },
+            data: {
+                archived: false,
+            },
+        });
+
+        await tx.column.updateMany({
+            where: {
+                boardId,
+                archived: true,
+            },
+            data: {
+                archived: false,
+            },
+        });
+
+        await tx.board.update({
+            where: {
+                id: boardId,
+            },
+            data: {
+                archived: false,
+            },
+        });
+    });
+}
+
+export { getBoardsRepository, createBoard, editBoard, deleteBoard, findBoardById, reorderBoards, getBoardsLastPos, archiveBoard, unarchiveBoard };

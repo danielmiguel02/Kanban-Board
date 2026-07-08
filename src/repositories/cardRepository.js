@@ -35,54 +35,93 @@ const deleteCard = async (data) => {
     });
 }
 
+const moveCardToColumn = async (data) => {
+    const { cardId, columnId } = data;
+
+    return prisma.card.update({
+        where: {
+            id: cardId,
+            archived: false,
+        },
+        data: {
+            columnId: columnId,
+        },
+    });
+}
+
 const getCardsLastPos = async (columnId) => {
     return prisma.card.aggregate({
         _max: { position: true },
-        where: { columnId: columnId },
+        where: { columnId: columnId, archived: false },
     });
 };
 
-const findOwnedCard = async (cardId, userId) => {
-    return prisma.card.findFirst({
+const findCardById = async (cardId) => {
+    return prisma.card.findUnique({
         where: {
             id: cardId,
-            column: {
-                board: {
-                    ownerId: userId,
-                },
-            },
         },
     });
 };
 
 const reorderCards = async (userId) => {
     return prisma.$transaction(async (tx) => {
-        const cards = await tx.card.findMany({
+        const columns = await tx.column.findMany({
             where: {
-                column: {
-                    board: {
-                        ownerId: userId,
-                    },
+                archived: false,
+                board: {
+                    ownerId: userId,
                 },
             },
-            orderBy: {
-                position: 'asc',
-            },
+            select: { id: true },
         });
 
-        for (let i = 0; i < cards.length; i++) {
-            if (cards[i].position !== i + 1) {
-                await tx.card.update({
-                    where: {
-                        id: cards[i].id,
-                    },
-                    data: {
-                        position: i + 1,
-                    },
-                });
+        for (const column of columns) {
+            const cards = await tx.card.findMany({
+                where: {
+                    columnId: column.id,
+                    archived: false,
+                },
+                orderBy: {
+                    position: 'asc',
+                },
+            });
+
+            for (let i = 0; i < cards.length; i++) {
+                if (cards[i].position !== i + 1) {
+                    await tx.card.update({
+                        where: { id: cards[i].id },
+                        data: { position: i + 1 },
+                    });
+                }
             }
         }
     });
 };
 
-export { createCard, editCard, deleteCard, getCardsLastPos, findOwnedCard, reorderCards };
+const archiveCard = async (data) => {
+    const { cardId } = data;
+    return prisma.card.update({
+        where: {
+            id: cardId,
+        },
+        data: {
+            archived: true,
+        },
+    });
+};
+
+const unarchiveCard = async (data) => {
+    const { cardId } = data;
+
+    return prisma.card.update({
+        where: {
+            id: cardId,
+        },
+        data: {
+            archived: false,
+        },
+    });
+};
+
+export { createCard, editCard, deleteCard, moveCardToColumn, getCardsLastPos, findCardById, reorderCards, archiveCard, unarchiveCard };

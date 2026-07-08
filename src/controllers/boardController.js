@@ -217,4 +217,31 @@ const removeMembersFromBoard = async (req, res) => {
     }
 };
 
-export { getBoards, getBoard, createBoard, editBoard, deleteBoard, archiveBoard, unarchiveBoard, addMembersToBoard, removeMembersFromBoard };
+const editMembersRoleFromBoard = async (req, res) => {
+    try {
+        const boardId = Number(req.params.boardId);
+
+        if (isNaN(boardId)) {
+            return res.status(400).json({
+                message: "Invalid board ID",
+            });
+        }
+
+        await editMembersRoleFromBoardService({
+            data: req.body,
+            boardId: boardId,
+            userId: req.user.id
+        });
+
+        return res.status(200).json({
+            message: "Member role editted successfully",
+        });
+
+    } catch(error) {
+        return res.status(400).json({
+            message: error.message,
+        });
+    }
+};
+
+export { getBoards, getBoard, createBoard, editBoard, deleteBoard, archiveBoard, unarchiveBoard, addMembersToBoard, removeMembersFromBoard, editMembersRoleFromBoard };
