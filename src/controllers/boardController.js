@@ -1,5 +1,45 @@
-import { createBoardService, editBoardService, deleteBoardService, archiveBoardService, unarchiveBoardService } from '../services/boardService.js';
-import { addMembersToBoardService, removeMembersFromBoardService, editMembersRoleFromBoardService } from '../services/boardMemberService.js';
+import { getBoardsService, getBoardService, createBoardService, editBoardService, deleteBoardService, archiveBoardService, unarchiveBoardService } from '../services/boardService.js';
+import { getSharedBoardsService, addMembersToBoardService, removeMembersFromBoardService } from '../services/boardMemberService.js';
+
+const getBoards = async (req, res) => {
+    try {
+
+        const ownedBoards = await getBoardsService(req.user.id);
+
+        const sharedBoards = await getSharedBoardsService(req.user.id);
+
+        return res.status(200).json({
+            message: "Boards retrieved successfully",
+            ownedBoards,
+            sharedBoards
+        });
+
+    } catch (error) {
+
+        return res.status(400).json({
+            message: error.message
+        });
+
+    }
+};
+
+const getBoard = async (req, res) => {
+    try {
+        const board = await getBoardService({
+            boardId: req.params.boardId,
+            ownerId: req.user.id,
+        });
+
+        return res.status(200).json({
+            message: "Board retrieved successfully",
+            board,
+        });
+    } catch (error) {
+        return res.status(400).json({
+            message: error.message,
+        });
+    }
+};
 
 const createBoard = async (req, res) => {
     try {
@@ -204,4 +244,4 @@ const editMembersRoleFromBoard = async (req, res) => {
     }
 };
 
-export { createBoard, editBoard, deleteBoard, archiveBoard, unarchiveBoard, addMembersToBoard, removeMembersFromBoard, editMembersRoleFromBoard };
+export { getBoards, getBoard, createBoard, editBoard, deleteBoard, archiveBoard, unarchiveBoard, addMembersToBoard, removeMembersFromBoard, editMembersRoleFromBoard };

@@ -1,7 +1,16 @@
 import { findBoardById } from "../repositories/boardRepository.js";
 import { findUserByEmail } from "../repositories/authRepository.js";
-import { findBoardMember, createBoardMember, removeBoardMember, editBoardMemberRole } from "../repositories/boardMemberRepository.js";
+import { getSharedBoardsRepository, findBoardMember, createBoardMember, removeBoardMember, editBoardMemberRole } from "../repositories/boardMemberRepository.js";
 
+const getSharedBoardsService = async (userId) => {
+    if (!userId) {
+        throw new Error("User is required to get shared boards.")
+    }
+
+    const sharedBoards = await getSharedBoardsRepository(userId);
+
+    return sharedBoards;
+};
 
 const addMembersToBoardService = async ({data, boardId, userId}) => {
     const { email, role } = data;
@@ -135,4 +144,4 @@ const editMembersRoleFromBoardService = async ({data, boardId, userId}) => {
     });
 };
 
-export { addMembersToBoardService, removeMembersFromBoardService, editMembersRoleFromBoardService };
+export { getSharedBoardsService, addMembersToBoardService, removeMembersFromBoardService, editMembersRoleFromBoardService };

@@ -1,6 +1,26 @@
-import { getColumnsLastPos, findColumnById, reorderColumns, createColumn, editColumn, deleteColumn, archiveColumn, unarchiveColumn } from "../repositories/columnRepository.js";
+import { getColumnsRepository, getColumnsLastPos, findColumnById, reorderColumns, createColumn, editColumn, deleteColumn, moveColumnRepository, archiveColumn, unarchiveColumn } from "../repositories/columnRepository.js";
 import { findBoardById } from "../repositories/boardRepository.js";
 import { checkBoardPermission } from "./permissionService.js";
+
+const getColumnsService = async ({ userId, boardId }) => {
+
+    if (!boardId)
+        throw new Error("BoardId is required.");
+
+    const board = await findBoardById(boardId);
+
+    if (!board)
+        throw new Error("Board not found.");
+
+    await checkBoardPermission({
+        boardId,
+        userId,
+        requiredRole: "VIEW"
+    });
+
+    return await getColumnsRepository(boardId);
+
+};
 
 const createColumnService = async ({data, boardId, userId}) => {
     const { name } = data;
@@ -115,7 +135,31 @@ const deleteColumnService = async ({columnId, userId}) => {
         columnId
     });
 
-    await reorderColumns(userId);
+    await reorderColumns(column.boardId);
+};
+
+const moveColumnService = async ({ columnId, position, userId }) => {
+
+    const column = await findColumnById(columnId);
+
+    if (!column) {
+        throw new Error("Column not found.");
+    }
+
+    await checkBoardPermission({
+        boardId: column.boardId,
+        userId,
+        requiredRole: "EDIT",
+    });
+
+    const movedColumn = await moveColumnRepository({
+        columnId,
+        position,
+    });
+
+    await reorderColumns(column.boardId);
+
+    return movedColumn;
 };
 
 const archiveColumnService = async ({columnId, userId}) => {
@@ -149,7 +193,7 @@ const archiveColumnService = async ({columnId, userId}) => {
         columnId
     });
 
-    await reorderColumns(userId);
+    await reorderColumns(column.boardId);
 };
 
 const unarchiveColumnService = async ({columnId, userId}) => {
@@ -183,7 +227,7 @@ const unarchiveColumnService = async ({columnId, userId}) => {
         columnId
     });
 
-    await reorderColumns(userId);
+    await reorderColumns(column.boardId);
 };
 
-export { createColumnService, editColumnService, deleteColumnService, archiveColumnService, unarchiveColumnService };
+export { getColumnsService, createColumnService, editColumnService, deleteColumnService, moveColumnService, archiveColumnService, unarchiveColumnService };
