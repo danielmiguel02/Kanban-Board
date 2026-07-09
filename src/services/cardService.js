@@ -173,14 +173,10 @@ const moveCardToColumnService = async ({ cardId, columnId, userId }) => {
         columnId,
     });
 
-    await reorderCards({
-        columnId: oldColumnId
-    });
+    await reorderCards(userId);
 
     if (oldColumnId !== columnId) {
-        await reorderCards({
-            columnId
-        });
+        await reorderCards(userId);
     }
 
     return {
