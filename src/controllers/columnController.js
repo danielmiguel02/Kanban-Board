@@ -103,8 +103,8 @@ const moveColumn = async (req, res) => {
     try {
 
         const result = await moveColumnService({
-            columnId: req.params.columnId,
-            position: req.body.position,
+            columnId: Number(req.params.columnId),
+            position: Number(req.body.position),
             userId: req.user.id,
         });
 
