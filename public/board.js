@@ -330,41 +330,22 @@ async function loadAllCards(columns) {
 
 async function updateColumnPositions() {
 
+    const cols = [...document.querySelectorAll(".kanban-column")];
 
-    const cols =
-        [...document.querySelectorAll(".kanban-column")];
+    for (let i = 0; i < cols.length; i++) {
 
+        await fetch(`${API}/columns/${cols[i].dataset.id}/move`, {
+            method: "PATCH",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                position: i + 1
+            })
+        });
 
-
-    const positions =
-        cols.map((col,index)=>({
-
-            id: col.dataset.id,
-
-            position:index
-
-        }));
-
-
-
-    await fetch(`${API}/columns/reorder`, {
-
-        method:"PATCH",
-
-        credentials:"include",
-
-        headers:{
-            "Content-Type":"application/json"
-        },
-
-
-        body:JSON.stringify({
-            columns:positions
-        })
-
-    });
-
-
+    }
 
     await loadColumns();
 
