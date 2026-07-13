@@ -200,115 +200,126 @@ function renderColumns(columns) {
 
 async function loadCards(columnId) {
 
-
     const res = await fetch(`${API}/cards/${columnId}`, {
         credentials: "include"
     });
 
-
     const data = await res.json();
 
-
-    const container =
-        document.getElementById(`column-${columnId}`);
-
+    const container = document.getElementById(`column-${columnId}`);
 
     container.innerHTML = "";
 
-
     data.cards.forEach(card => {
-
 
         const cardEl = document.createElement("div");
 
-
-        cardEl.className =
-            "kanban-card card p-2 mb-2";
-
-
+        cardEl.className = "kanban-card card p-2 mb-2";
         cardEl.dataset.id = card.id;
-
-
         cardEl.draggable = true;
 
-
-        cardEl.innerText = card.title;
-
-
-
-        /*
-            CARD DRAG
-        */
-
+        cardEl.textContent = card.title;
 
         cardEl.addEventListener("dragstart", () => {
 
-
             draggedCard = cardEl;
 
-
-            cardEl.style.opacity = "0.5";
+            setTimeout(() => {
+                cardEl.style.display = "none";
+            });
 
         });
-
-
 
         cardEl.addEventListener("dragend", async () => {
 
-
-            cardEl.style.opacity = "1";
-
-
+            cardEl.style.display = "";
             draggedCard = null;
+
+            const cards = [...container.querySelectorAll(".kanban-card")];
+
+            const position =
+                cards.indexOf(cardEl) + 1;
+
+            await fetch(
+                `${API}/cards/${cardEl.dataset.id}/move/${columnId}`,
+                {
+                    method: "PATCH",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        position
+                    })
+                }
+            );
+
+            await loadColumns();
 
         });
 
-
-
         container.appendChild(cardEl);
 
-
     });
-
-
 
     container.addEventListener("dragover", e => {
 
         e.preventDefault();
 
-    });
-
-
-
-    container.addEventListener("drop", async e => {
-
-
-        e.preventDefault();
-
-
         if (!draggedCard)
             return;
 
+        const afterElement =
+            getDragAfterElement(container, e.clientY);
 
+        if (afterElement == null) {
 
-        const cardId =
-            draggedCard.dataset.id;
+            container.appendChild(draggedCard);
 
+        } else {
 
+            container.insertBefore(
+                draggedCard,
+                afterElement
+            );
 
-        await fetch(
-            `${API}/cards/${cardId}/move/${columnId}`,
-            {
-                method:"PATCH",
-                credentials:"include"
-            }
-        );
-
-
-        await loadColumns();
-
+        }
 
     });
+
+}
+
+/* =========================
+   Load Cards Helper
+========================= */
+
+function getDragAfterElement(container, mouseY) {
+
+    const draggableCards =
+        [...container.querySelectorAll(".kanban-card:not([style*='display: none'])")];
+
+    return draggableCards.reduce((closest, child) => {
+
+        const box =
+            child.getBoundingClientRect();
+
+        const offset =
+            mouseY - box.top - box.height / 2;
+
+        if (offset < 0 && offset > closest.offset) {
+
+            return {
+                offset,
+                element: child
+            };
+
+        }
+
+        return closest;
+
+    }, {
+        offset: Number.NEGATIVE_INFINITY
+    }).element;
 
 }
 
