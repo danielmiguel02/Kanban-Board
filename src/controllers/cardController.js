@@ -115,6 +115,7 @@ const moveCardToColumn = async (req, res) => {
         const movedCard = await moveCardToColumnService({
             cardId: parsedCardId,
             columnId: parsedColumnId,
+            position: req.body.position,
             userId: req.user.id,
         });
 
