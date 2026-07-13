@@ -52,13 +52,14 @@ const deleteCard = async (data) => {
     });
 }
 
-const moveCardToColumn = async ({ cardId, columnId }) => {
+const moveCardToColumn = async ({ cardId, columnId, position }) => {
     return prisma.card.update({
         where: {
             id: cardId,
         },
         data: {
             columnId,
+            position
         },
     });
 };
