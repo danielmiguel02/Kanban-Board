@@ -9,6 +9,7 @@ const getBoardsRepository = async (userId) => {
         select: {
             id: true,
             name: true,
+            color: true,
             position: true,
             archived: true,
         },
@@ -18,12 +19,67 @@ const getBoardsRepository = async (userId) => {
     });
 };
 
+const getBoardRepository = async (boardId) => {
+
+    return prisma.board.findUnique({
+
+        where: {
+            id: Number(boardId),
+        },
+        include: {
+            owner: {
+                select: {
+                    id: true,
+                    name: true,
+                }
+            },
+            members: {
+                select: {
+                    role: true,
+                    userId: true,
+                    user: {
+                        select: {
+                            id: true,
+                            name: true,
+                            email: true,
+                        }
+                    }
+                }
+            },
+            columns: {
+                where: {
+                    archived: false,
+                },
+                orderBy: {
+                    position: "asc",
+                },
+                include: {
+                    cards: {
+                        where: {
+                            archived: false,
+                        },
+                        orderBy: {
+                            position: "asc",
+                        }
+                    }
+
+                }
+
+            }
+
+        }
+
+    });
+
+};
+
 const createBoard = async (data) => {
-    const { name, ownerId, position } = data;
+    const { name, color, ownerId, position } = data;
 
     return prisma.board.create({
         data: {
             name: name,
+            color: color,
             ownerId: ownerId,
             position: position
         },
@@ -31,14 +87,15 @@ const createBoard = async (data) => {
 };
 
 const editBoard = async (data) => {
-    const { name, boardId } = data;
+    const { name, color, boardId } = data;
 
     return prisma.board.update({
         where: {
             id: boardId
         },
         data: {
-            name: name
+            name: name,
+            color: color,
         },
     });
 };
@@ -186,4 +243,4 @@ const unarchiveBoard = async (data) => {
     });
 }
 
-export { getBoardsRepository, createBoard, editBoard, deleteBoard, findBoardById, reorderBoards, getBoardsLastPos, archiveBoard, unarchiveBoard };
+export { getBoardsRepository, getBoardRepository, createBoard, editBoard, deleteBoard, findBoardById, reorderBoards, getBoardsLastPos, archiveBoard, unarchiveBoard };

@@ -77,4 +77,4 @@ const editBoardMemberRole = async ({boardId, userId, role}) => {
     });
 };
 
-export { findBoardMember, createBoardMember, removeBoardMember, editBoardMemberRole };
+export { getSharedBoardsRepository, findBoardMember, createBoardMember, removeBoardMember, editBoardMemberRole };

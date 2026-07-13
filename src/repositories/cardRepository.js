@@ -1,5 +1,22 @@
 import { prisma } from "../config/db.js";
 
+const getCardsRepository = async (columnId) => {
+
+    return prisma.card.findMany({
+
+        where: {
+            columnId,
+            archived: false
+        },
+
+        orderBy: {
+            position: "asc"
+        }
+
+    });
+
+};
+
 const createCard = async (data) => {
     const { title, position, columnId } = data;
 
@@ -35,19 +52,16 @@ const deleteCard = async (data) => {
     });
 }
 
-const moveCardToColumn = async (data) => {
-    const { cardId, columnId } = data;
-
+const moveCardToColumn = async ({ cardId, columnId }) => {
     return prisma.card.update({
         where: {
             id: cardId,
-            archived: false,
         },
         data: {
-            columnId: columnId,
+            columnId,
         },
     });
-}
+};
 
 const getCardsLastPos = async (columnId) => {
     return prisma.card.aggregate({
@@ -124,4 +138,4 @@ const unarchiveCard = async (data) => {
     });
 };
 
-export { createCard, editCard, deleteCard, moveCardToColumn, getCardsLastPos, findCardById, reorderCards, archiveCard, unarchiveCard };
+export { getCardsRepository, createCard, editCard, deleteCard, moveCardToColumn, getCardsLastPos, findCardById, reorderCards, archiveCard, unarchiveCard };
