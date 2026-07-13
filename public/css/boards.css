@@ -4,17 +4,19 @@
 
 body {
     background: #f4f6fb;
+    overflow-x: hidden;
 }
 
+
 /* =========================
-   BOARD CARD
+   BOARD CARD (BOARD LIST)
 ========================= */
 
 .board-card {
     position: relative;
-    height: 120px;
-    border-radius: 12px;
-    padding: 12px;
+    height: 130px;
+    border-radius: 14px;
+    padding: 14px;
 
     color: white;
     font-weight: 600;
@@ -25,25 +27,31 @@ body {
 
     cursor: pointer;
 
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
     overflow: hidden;
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
 }
 
-/* hover effect */
+
 .board-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.18);
 }
 
-/* subtle dark overlay for readability */
+
 .board-card::after {
     content: "";
     position: absolute;
     inset: 0;
+
     background: rgba(0,0,0,0.15);
+
+    pointer-events: none;
 }
 
-/* keep text above overlay */
+
 .board-card span,
 .board-card small,
 .board-card .badge {
@@ -51,75 +59,273 @@ body {
     z-index: 2;
 }
 
-/* owner text */
+
 .board-card small {
     font-size: 12px;
-    opacity: 0.85;
+    opacity: .85;
 }
 
-/* role badge */
+
 .board-card .badge {
+
     width: fit-content;
+
     font-size: 11px;
-    padding: 4px 8px;
+
+    padding: 5px 10px;
+
     border-radius: 999px;
 }
+
 
 /* =========================
    EMPTY STATE
 ========================= */
 
+
 .alert {
-    border-radius: 10px;
+    border-radius: 12px;
 }
 
+
+
 /* =========================
-   BUTTON POLISH
+   BUTTONS
 ========================= */
+
 
 #createBoardBtn {
+
     border-radius: 10px;
-    padding: 8px 14px;
+
+    padding: 9px 16px;
+
+    font-weight: 600;
 }
+
+
 
 /* =========================
-   GRID SPACING FIX
+   KANBAN BOARD WRAPPER
 ========================= */
 
-#ownedBoards .col-lg-3,
-#sharedBoards .col-lg-3 {
-    display: flex;
-}
 
 .columns-wrapper {
+
     display: flex;
-    gap: 16px;
+
+    flex-wrap: nowrap;
+
+    gap: 18px;
+
+    width: 100%;
+
     overflow-x: auto;
+
     align-items: flex-start;
-    padding-bottom: 10px;
+
+    padding: 15px;
+
+    min-height: calc(100vh - 150px);
 }
 
-/* EACH COLUMN */
+
+/*
+    IMPORTANT:
+    Prevent columns affecting each other's size
+*/
+
+.columns-wrapper > * {
+
+    flex: 0 0 300px;
+
+}
+
+
+
+/* =========================
+   COLUMN
+========================= */
+
+
 .kanban-column {
+
+    width: 300px;
+
     min-width: 300px;
+
     max-width: 300px;
-    background: #f8f9fa;
-    border-radius: 10px;
-    padding: 10px;
+
+
+    background: #eef1f6;
+
+
+    border-radius: 14px;
+
+
+    padding: 12px;
+
+
     flex-shrink: 0;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+
+
+    box-shadow:
+        0 4px 10px rgba(0,0,0,.08);
+
+
+    display: flex;
+
+    flex-direction: column;
+
+
+    transition:
+        background .2s ease,
+        box-shadow .2s ease;
 }
 
-/* CARDS */
-.kanban-card {
-    background: white;
-    border-radius: 8px;
-    padding: 10px;
-    margin-bottom: 8px;
-    cursor: grab;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+
+/*
+    Column being dragged
+*/
+
+.kanban-column.dragging {
+
+    opacity: .7;
+
+    box-shadow:
+        0 15px 30px rgba(0,0,0,.25);
+
 }
+
+
+
+/* COLUMN TITLE */
+
+
+.kanban-column h5 {
+
+    margin-bottom: 12px;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+}
+
+
+
+/* =========================
+   CARD LIST
+========================= */
+
+
+.cards-container {
+
+    min-height: 40px;
+
+    flex: 1;
+
+}
+
+
+
+/* =========================
+   TASK CARDS
+========================= */
+
+
+.kanban-card {
+
+    background: white;
+
+
+    border-radius: 10px;
+
+
+    padding: 12px;
+
+
+    margin-bottom: 10px;
+
+
+    cursor: grab;
+
+
+    box-shadow:
+        0 2px 5px rgba(0,0,0,.10);
+
+
+    transition:
+
+        transform .15s ease,
+
+        box-shadow .15s ease;
+}
+
+
+
+.kanban-card:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 6px 14px rgba(0,0,0,.15);
+
+}
+
+
 
 .kanban-card:active {
+
     cursor: grabbing;
+
+}
+
+
+
+/*
+    Card being dragged
+*/
+
+.kanban-card.dragging {
+
+    opacity: .6;
+
+    transform: rotate(2deg);
+
+}
+
+
+
+/* =========================
+   DROP TARGETS
+========================= */
+
+
+.drag-over {
+
+    background: #dfe6f5 !important;
+
+}
+
+
+
+/* =========================
+   SCROLLBAR
+========================= */
+
+
+.columns-wrapper::-webkit-scrollbar {
+
+    height: 8px;
+
+}
+
+
+.columns-wrapper::-webkit-scrollbar-thumb {
+
+    background: #c5cad5;
+
+    border-radius: 10px;
+
 }
