@@ -142,7 +142,7 @@ const deleteCardService = async ({cardId, userId}) => {
     await reorderCards(userId);
 };
 
-const moveCardToColumnService = async ({ cardId, columnId, userId }) => {
+const moveCardToColumnService = async ({ cardId, columnId, position, userId }) => {
 
     const card = await findCardById(cardId);
 
@@ -171,6 +171,7 @@ const moveCardToColumnService = async ({ cardId, columnId, userId }) => {
     const movedCard = await moveCardToColumn({
         cardId,
         columnId,
+        position,
     });
 
     await reorderCards(userId);
