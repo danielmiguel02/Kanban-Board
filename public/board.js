@@ -225,7 +225,7 @@ async function loadCards(columnId) {
             draggedCard = cardEl;
 
             setTimeout(() => {
-                cardEl.style.display = "none";
+                cardEl.classList.add("dragging");
             });
 
         });
