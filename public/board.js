@@ -70,14 +70,14 @@ async function loadColumns() {
 
     const data = await res.json();
 
-    renderColumns(data.columns);
+    await renderColumns(data.columns);
 }
 
 /* =========================
    RENDER COLUMNS
 ========================= */
 
-function renderColumns(columns) {
+async function renderColumns(columns) {
 
     columnsContainer.innerHTML = "";
 
@@ -121,7 +121,7 @@ function renderColumns(columns) {
 
             draggedColumn = columnEl;
 
-            columnEl.style.opacity = "0.5";
+            columnEl.classList.add("dragging");
 
         });
 
@@ -129,7 +129,7 @@ function renderColumns(columns) {
 
         columnEl.addEventListener("dragend", async () => {
 
-            columnEl.style.opacity = "1";
+            columnEl.classList.remove("dragging");
 
             draggedColumn = null;
 
@@ -190,7 +190,7 @@ function renderColumns(columns) {
     });
 
 
-    loadAllCards(columns);
+    await loadAllCards(columns);
 
 }
 
@@ -226,22 +226,28 @@ async function loadCards(columnId) {
 
             setTimeout(() => {
                 cardEl.classList.add("dragging");
-            });
+                cardEl.style.opacity = "0";
+            }, 0);
 
         });
 
         cardEl.addEventListener("dragend", async () => {
 
-            cardEl.style.display = "";
-            draggedCard = null;
+            cardEl.classList.remove("dragging");
+            cardEl.style.opacity = "";
 
-            const cards = [...container.querySelectorAll(".kanban-card")];
+            const targetColumnId =
+                cardEl.closest(".kanban-card-list")
+                    .id.replace("column-", "");
+
+            const cards =
+                [...cardEl.parentElement.querySelectorAll(".kanban-card")];
 
             const position =
                 cards.indexOf(cardEl) + 1;
 
             await fetch(
-                `${API}/cards/${cardEl.dataset.id}/move/${columnId}`,
+                `${API}/cards/${cardEl.dataset.id}/move/${targetColumnId}`,
                 {
                     method: "PATCH",
                     credentials: "include",
@@ -254,7 +260,7 @@ async function loadCards(columnId) {
                 }
             );
 
-            await loadColumns();
+            draggedCard = null;
 
         });
 
@@ -262,30 +268,36 @@ async function loadCards(columnId) {
 
     });
 
-    container.addEventListener("dragover", e => {
+    if (!container.dataset.dragInitialized) {
 
-        e.preventDefault();
+        container.dataset.dragInitialized = "true";
 
-        if (!draggedCard)
-            return;
+        container.addEventListener("dragover", e => {
 
-        const afterElement =
-            getDragAfterElement(container, e.clientY);
+            e.preventDefault();
 
-        if (afterElement == null) {
+            if (!draggedCard)
+                return;
 
-            container.appendChild(draggedCard);
+            const afterElement =
+                getDragAfterElement(container, e.clientY);
 
-        } else {
+            if (afterElement == null) {
 
-            container.insertBefore(
-                draggedCard,
-                afterElement
-            );
+                container.appendChild(draggedCard);
 
-        }
+            } else {
 
-    });
+                container.insertBefore(
+                    draggedCard,
+                    afterElement
+                );
+
+            }
+
+        });
+
+    }
 
 }
 
@@ -295,8 +307,9 @@ async function loadCards(columnId) {
 
 function getDragAfterElement(container, mouseY) {
 
-    const draggableCards =
-        [...container.querySelectorAll(".kanban-card:not([style*='display: none'])")];
+    const draggableCards = [
+        ...container.querySelectorAll(".kanban-card:not(.dragging)")
+    ];
 
     return draggableCards.reduce((closest, child) => {
 
@@ -341,24 +354,26 @@ async function loadAllCards(columns) {
 
 async function updateColumnPositions() {
 
-    const cols = [...document.querySelectorAll(".kanban-column")];
+    const cols =
+        [...document.querySelectorAll(".kanban-column")];
 
     for (let i = 0; i < cols.length; i++) {
 
-        await fetch(`${API}/columns/${cols[i].dataset.id}/move`, {
-            method: "PATCH",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                position: i + 1
-            })
-        });
+        await fetch(
+            `${API}/columns/${cols[i].dataset.id}/move`,
+            {
+                method: "PATCH",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    position: i + 1
+                })
+            }
+        );
 
     }
-
-    await loadColumns();
 
 }
 
@@ -409,7 +424,7 @@ async function createCard() {
     cardTitleInput.value = "";
     addCardModal.hide();
 
-    await loadCards(columnId);
+    await loadColumns();
 }
 
 /* =========================
