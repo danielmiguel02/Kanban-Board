@@ -91,18 +91,18 @@ function renderColumns(columns) {
 
         const columnEl = document.createElement("div");
 
-        columnEl.className = "kanban-column card";
+        columnEl.className = "kanban-column";
         columnEl.dataset.id = column.id;
         columnEl.draggable = true;
 
 
         columnEl.innerHTML = `
-            <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="column-header">
 
                 <strong>${column.name}</strong>
 
                 <button class="btn btn-sm btn-outline-primary add-card-btn">
-                    + Card
+                    + Add Card
                 </button>
 
             </div>
@@ -214,7 +214,7 @@ async function loadCards(columnId) {
 
         const cardEl = document.createElement("div");
 
-        cardEl.className = "kanban-card card p-2 mb-2";
+        cardEl.className = "kanban-card";
         cardEl.dataset.id = card.id;
         cardEl.draggable = true;
 
