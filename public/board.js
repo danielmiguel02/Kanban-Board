@@ -119,6 +119,7 @@ async function renderColumns(columns) {
 
         columnEl.addEventListener("dragstart", () => {
 
+            draggedCard = null;
             draggedColumn = columnEl;
 
             columnEl.classList.add("dragging");
@@ -141,26 +142,29 @@ async function renderColumns(columns) {
 
         columnEl.addEventListener("dragover", e => {
 
+            if (draggedCard) return;
+
+            if (!draggedColumn) return;
+
             e.preventDefault();
 
         });
 
-
-
         columnEl.addEventListener("drop", e => {
+
+            if (draggedCard) return;
+
+            if (!draggedColumn) return;
 
             e.preventDefault();
 
-
-            if (!draggedColumn || draggedColumn === columnEl)
+            if (draggedColumn === columnEl)
                 return;
-
 
             const rect = columnEl.getBoundingClientRect();
 
             const next =
                 e.clientX < rect.left + rect.width / 2;
-
 
             columnsContainer.insertBefore(
                 draggedColumn,
@@ -222,6 +226,7 @@ async function loadCards(columnId) {
 
         cardEl.addEventListener("dragstart", () => {
 
+            draggedColumn = null;
             draggedCard = cardEl;
 
             setTimeout(() => {
