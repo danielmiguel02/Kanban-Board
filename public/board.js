@@ -86,18 +86,14 @@ async function renderColumns(columns) {
         return;
     }
 
-
     columns.forEach(column => {
 
         const columnEl = document.createElement("div");
-
         columnEl.className = "kanban-column";
         columnEl.dataset.id = column.id;
-        columnEl.draggable = true;
-
 
         columnEl.innerHTML = `
-            <div class="column-header">
+            <div class="column-header" draggable="true">
 
                 <strong>${column.name}</strong>
 
@@ -107,42 +103,36 @@ async function renderColumns(columns) {
 
             </div>
 
-
             <div class="kanban-card-list" id="column-${column.id}"></div>
         `;
 
+        const header = columnEl.querySelector(".column-header");
 
+        /* =========================
+           COLUMN DRAG (HEADER ONLY)
+        ========================= */
 
-        /*
-            COLUMN DRAG
-        */
+        header.addEventListener("dragstart", () => {
 
-        columnEl.addEventListener("dragstart", () => {
-
-            draggedCard = null;
             draggedColumn = columnEl;
-
             columnEl.classList.add("dragging");
 
         });
 
-
-
-        columnEl.addEventListener("dragend", async () => {
+        header.addEventListener("dragend", async () => {
 
             columnEl.classList.remove("dragging");
-
             draggedColumn = null;
 
             await updateColumnPositions();
 
         });
 
-
+        /* =========================
+           COLUMN DROP
+        ========================= */
 
         columnEl.addEventListener("dragover", e => {
-
-            if (draggedCard) return;
 
             if (!draggedColumn) return;
 
@@ -152,19 +142,14 @@ async function renderColumns(columns) {
 
         columnEl.addEventListener("drop", e => {
 
-            if (draggedCard) return;
-
             if (!draggedColumn) return;
 
             e.preventDefault();
 
-            if (draggedColumn === columnEl)
-                return;
+            if (draggedColumn === columnEl) return;
 
             const rect = columnEl.getBoundingClientRect();
-
-            const next =
-                e.clientX < rect.left + rect.width / 2;
+            const next = e.clientX < rect.left + rect.width / 2;
 
             columnsContainer.insertBefore(
                 draggedColumn,
@@ -173,26 +158,22 @@ async function renderColumns(columns) {
 
         });
 
+        /* =========================
+           ADD CARD BUTTON
+        ========================= */
 
-
-        const addCardBtn =
-            columnEl.querySelector(".add-card-btn");
-
+        const addCardBtn = columnEl.querySelector(".add-card-btn");
 
         addCardBtn.addEventListener("click", () => {
 
             activeColumnIdInput.value = column.id;
-
             addCardModal.show();
 
         });
 
-
-
         columnsContainer.appendChild(columnEl);
 
     });
-
 
     await loadAllCards(columns);
 
@@ -280,12 +261,11 @@ async function loadCards(columnId) {
         container.addEventListener("dragover", e => {
 
             e.preventDefault();
+            e.stopPropagation(); // prevent column drag logic
 
-            if (!draggedCard)
-                return;
+            if (!draggedCard) return;
 
-            const afterElement =
-                getDragAfterElement(container, e.clientY);
+            const afterElement = getDragAfterElement(container, e.clientY);
 
             if (afterElement == null) {
 
@@ -293,12 +273,16 @@ async function loadCards(columnId) {
 
             } else {
 
-                container.insertBefore(
-                    draggedCard,
-                    afterElement
-                );
+                container.insertBefore(draggedCard, afterElement);
 
             }
+
+        });
+
+        container.addEventListener("drop", e => {
+
+            e.preventDefault();
+            e.stopPropagation(); // prevent column drop
 
         });
 
