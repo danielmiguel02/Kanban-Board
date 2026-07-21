@@ -20,6 +20,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("createBoardModal")
     );
 
+    setupThemePicker();
+
     createBoardBtn.addEventListener("click", openCreateBoardModal);
     saveBoardBtn.addEventListener("click", createBoard);
     logoutBtn.addEventListener("click", logout);
@@ -28,6 +30,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadBoards();
 
 });
+
+/* =========================
+   THEME PICKER
+========================= */
+
+function setupThemePicker() {
+
+    const options =
+        document.querySelectorAll(".theme-option");
+
+    const hidden =
+        document.getElementById("boardColor");
+
+    options.forEach(option => {
+
+        option.addEventListener("click", () => {
+
+            options.forEach(o =>
+                o.classList.remove("selected"));
+
+            option.classList.add("selected");
+
+            hidden.value =
+                option.dataset.color;
+
+        });
+
+    });
+
+}
 
 /* =========================
    CURRENT USER

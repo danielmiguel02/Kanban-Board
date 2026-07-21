@@ -1,9 +1,39 @@
 /* =========================
+   BOARD THEME VARIABLES
+========================= */
+
+:root{
+
+    --board-bg:#f4f6fb;
+
+    --column-bg:#f7f8fc;
+
+    --column-border:#e3e6ed;
+
+    --card-bg:#ffffff;
+
+    --card-border:#eceff5;
+
+    --text:#1d2129;
+
+    --header-border:#e5e5e5;
+
+    --button:#0d6efd;
+
+    --button-hover:#e8f0ff;
+
+    --scroll-track:#eef1f6;
+
+    --scroll-thumb:#bfc7d8;
+
+}
+
+/* =========================
    PAGE BACKGROUND
 ========================= */
 
 body {
-    background:#f4f6fb;
+    background:var(--board-bg);
 
     overflow-x:hidden;
 
@@ -113,7 +143,7 @@ body {
 
     background:none;
 
-    color:#0d6efd;
+    color:var(--button);
 
     font-weight:600;
 
@@ -123,7 +153,7 @@ body {
 
 .add-card-btn:hover{
 
-    background:#e8f0ff;
+    background:var(--button-hover);
 
     border-radius:8px;
 
@@ -185,8 +215,8 @@ body {
     flex-direction:column;
     flex-shrink:0;
 
-    background:#f7f8fc;
-    border:1px solid #e3e6ed;
+    background:var(--column-bg);
+    border:1px solid var(--column-border);
     border-radius:16px;
 
     padding:16px;
@@ -211,13 +241,13 @@ body {
 
     padding-bottom:12px;
 
-    border-bottom:1px solid #e5e5e5;
+    border-bottom:1px solid var(--header-border);
 
     font-size:17px;
 
     font-weight:700;
 
-    color:#1d2129;
+    color:var(--text);
 
 }
 
@@ -279,7 +309,7 @@ body {
 
 .kanban-card{
 
-    background:#fff;
+    background:var(--card-bg);
 
     border-radius:12px;
 
@@ -289,7 +319,9 @@ body {
 
     cursor:grab;
 
-    border:1px solid #eceff5;
+    border:1px solid var(--card-border);
+
+    color:var(--text);
 
     box-shadow:0 2px 8px rgba(0,0,0,.06);
 
@@ -364,7 +396,7 @@ html{
 
 .columns-wrapper::-webkit-scrollbar-track{
 
-    background:#eef1f6;
+    background:var(--scroll-track);
 
     border-radius:10px;
 
@@ -372,7 +404,7 @@ html{
 
 .columns-wrapper::-webkit-scrollbar-thumb{
 
-    background:#bfc7d8;
+    background:var(--scroll-thumb);
 
     border-radius:10px;
 
@@ -381,5 +413,77 @@ html{
 .columns-wrapper::-webkit-scrollbar-thumb:hover{
 
     background:#9aa5bc;
+
+}
+
+/* =========================
+   THEME PICKER
+========================= */
+
+.theme-picker{
+
+    display:flex;
+
+    gap:12px;
+
+    margin-top:10px;
+
+}
+
+.theme-option{
+
+    width:48px;
+
+    height:48px;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    border:3px solid transparent;
+
+    transition:.15s;
+
+}
+
+.theme-option:hover{
+
+    transform:scale(1.08);
+
+}
+
+.theme-option.selected{
+
+    border-color:#0d6efd;
+
+}
+
+.theme-option[data-theme="light"]{
+
+    background:#f4f6fb;
+
+}
+
+.theme-option[data-theme="slate"]{
+
+    background:#374151;
+
+}
+
+.theme-option[data-theme="ocean"]{
+
+    background:#2563eb;
+
+}
+
+.theme-option[data-theme="purple"]{
+
+    background:#7c3aed;
+
+}
+
+.theme-option[data-theme="rose"]{
+
+    background:#991b1b;
 
 }

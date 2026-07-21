@@ -27,6 +27,74 @@ let draggedCard = null;
 let draggedColumn = null;
 
 /* =========================
+   THEMES
+========================= */
+
+const THEMES = {
+
+    "#2563eb": {
+
+        background:"#dbeafe",
+
+        column:"#bfdbfe",
+
+        card:"#ffffff",
+
+        text:"#1e293b"
+
+    },
+
+    "#374151": {
+
+        background:"#2d333b",
+
+        column:"#3b4453",
+
+        card:"#596275",
+
+        text:"#ffffff"
+
+    },
+
+    "#7c3aed": {
+
+        background:"#ede9fe",
+
+        column:"#ddd6fe",
+
+        card:"#ffffff",
+
+        text:"#2e1065"
+
+    },
+
+    "#991b1b": {
+
+        background:"#fee2e2",
+
+        column:"#fecaca",
+
+        card:"#ffffff",
+
+        text:"#7f1d1d"
+
+    },
+
+    "#f4f6fb": {
+
+        background:"#f4f6fb",
+
+        column:"#ffffff",
+
+        card:"#ffffff",
+
+        text:"#111827"
+
+    }
+
+};
+
+/* =========================
    INIT
 ========================= */
 
@@ -56,6 +124,7 @@ async function loadBoard() {
 
     const data = await res.json();
     boardName.textContent = data.board.name;
+    applyTheme(data.board.color);
 }
 
 /* =========================
@@ -414,6 +483,38 @@ async function createCard() {
     addCardModal.hide();
 
     await loadColumns();
+}
+
+/* =========================
+   APPLY THEME
+========================= */
+
+function applyTheme(color){
+
+    const theme = THEMES[color] || THEMES["#f4f6fb"];
+
+    document.documentElement.style.setProperty("--board-bg",theme.background);
+
+    document.documentElement.style.setProperty("--column-bg",theme.column);
+
+    document.documentElement.style.setProperty("--column-border",theme.columnBorder);
+
+    document.documentElement.style.setProperty("--card-bg",theme.card);
+
+    document.documentElement.style.setProperty("--card-border",theme.cardBorder);
+
+    document.documentElement.style.setProperty("--text",theme.text);
+
+    document.documentElement.style.setProperty("--header-border",theme.header);
+
+    document.documentElement.style.setProperty("--button",theme.button);
+
+    document.documentElement.style.setProperty("--button-hover",theme.buttonHover);
+
+    document.documentElement.style.setProperty("--scroll-track",theme.scrollTrack);
+
+    document.documentElement.style.setProperty("--scroll-thumb",theme.scrollThumb);
+
 }
 
 /* =========================

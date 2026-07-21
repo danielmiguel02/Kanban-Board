@@ -74,15 +74,41 @@
                 <label class="form-label">Board Name</label>
                 <input id="boardName" class="form-control" />
 
-                <label class="form-label mt-3">Board Color</label>
+                <label class="form-label mt-3">Board Theme</label>
 
-                <select id="boardColor" class="form-select">
-                    <option value="#2563eb">Blue</option>
-                    <option value="#374151">Gray</option>
-                    <option value="#991b1b">Red</option>
-                    <option value="#065f46">Green</option>
-                    <option value="#7c3aed">Purple</option>
-                </select>
+                <div id="themePicker" class="theme-picker">
+
+                    <div class="theme-option selected"
+                        data-theme="light"
+                        data-color="#f4f6fb">
+                    </div>
+
+                    <div class="theme-option"
+                        data-theme="slate"
+                        data-color="#374151">
+                    </div>
+
+                    <div class="theme-option"
+                        data-theme="ocean"
+                        data-color="#2563eb">
+                    </div>
+
+                    <div class="theme-option"
+                        data-theme="purple"
+                        data-color="#7c3aed">
+                    </div>
+
+                    <div class="theme-option"
+                        data-theme="rose"
+                        data-color="#991b1b">
+                    </div>
+
+                </div>
+
+                <input
+                    type="hidden"
+                    id="boardColor"
+                    value="#f4f6fb">
 
             </div>
 
