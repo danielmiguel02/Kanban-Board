@@ -19,6 +19,21 @@ const logoutBtn = document.getElementById("logoutBtn");
 let addColumnModal;
 let addCardModal;
 
+const boardActions = document.getElementById("boardActions");
+
+const editBoardBtn = document.getElementById("editBoardBtn");
+
+const editBoardNameInput = document.getElementById("editBoardName");
+const editBoardColorInput = document.getElementById("editBoardColor");
+
+const saveBoardChangesBtn = document.getElementById("saveBoardChangesBtn");
+
+let editBoardModal;
+
+let currentBoard = null;
+
+let currentUser;
+
 /* =========================
    DRAG STATE
 ========================= */
@@ -102,15 +117,40 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     addColumnModal = new bootstrap.Modal(document.getElementById("addColumnModal"));
     addCardModal = new bootstrap.Modal(document.getElementById("addCardModal"));
+    editBoardModal = new bootstrap.Modal(document.getElementById("editBoardModal"));
 
     addColumnBtn.addEventListener("click", () => addColumnModal.show());
     saveColumnBtn.addEventListener("click", createColumn);
     saveCardBtn.addEventListener("click", createCard);
     logoutBtn.addEventListener("click", logout);
 
+    editBoardBtn.addEventListener("click", openEditBoardModal);
+    saveBoardChangesBtn.addEventListener("click", saveBoardChanges);
+
+    await loadCurrentUser();
+
     await loadBoard();
     await loadColumns();
 });
+
+/* =========================
+   LOAD CURRENT USER
+========================= */
+
+async function loadCurrentUser(){
+
+    const res = await fetch(
+        `${API}/auth/me`,
+        {
+            credentials:"include"
+        }
+    );
+
+    const data = await res.json();
+
+    currentUser = data.user;
+
+}
 
 /* =========================
    LOAD BOARD
@@ -123,8 +163,17 @@ async function loadBoard() {
     });
 
     const data = await res.json();
-    boardName.textContent = data.board.name;
-    applyTheme(data.board.color);
+    currentBoard = data.board;
+
+    if (currentBoard.owner.id === currentUser.id) {
+
+        boardActions.classList.remove("d-none");
+
+    }
+
+    boardName.textContent = currentBoard.name;
+
+    applyTheme(currentBoard.color);
 }
 
 /* =========================
@@ -514,6 +563,66 @@ function applyTheme(color){
     document.documentElement.style.setProperty("--scroll-track",theme.scrollTrack);
 
     document.documentElement.style.setProperty("--scroll-thumb",theme.scrollThumb);
+
+}
+
+/* =========================
+   Open modal
+========================= */
+
+function openEditBoardModal() {
+
+    editBoardNameInput.value = boardName.textContent;
+
+    editBoardColorInput.value = currentBoard.color;
+
+    editBoardModal.show();
+
+}
+
+/* =========================
+   Save Board Changes
+========================= */
+
+async function saveBoardChanges() {
+
+    const body = {
+
+        name: editBoardNameInput.value.trim(),
+        color: editBoardColorInput.value
+
+    };
+
+    const response = await fetch(
+        `${API}/boards/${boardId}`,
+        {
+
+            method: "PATCH",
+
+            credentials: "include",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(body)
+
+        }
+    );
+
+    if (!response.ok) {
+
+        alert("Unable to update board.");
+
+        return;
+
+    }
+
+    editBoardModal.hide();
+
+    await loadBoard();
+
+    await loadColumns();
 
 }
 
