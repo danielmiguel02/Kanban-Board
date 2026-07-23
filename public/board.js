@@ -19,8 +19,6 @@ const logoutBtn = document.getElementById("logoutBtn");
 let addColumnModal;
 let addCardModal;
 
-const boardActions = document.getElementById("boardActions");
-
 const editBoardBtn = document.getElementById("editBoardBtn");
 
 const editBoardNameInput = document.getElementById("editBoardName");
@@ -166,9 +164,7 @@ async function loadBoard() {
     currentBoard = data.board;
 
     if (currentBoard.owner.id === currentUser.id) {
-
-        boardActions.classList.remove("d-none");
-
+        editBoardBtn.classList.remove("d-none");
     }
 
     boardName.textContent = currentBoard.name;
