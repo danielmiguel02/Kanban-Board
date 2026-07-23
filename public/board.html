@@ -299,17 +299,41 @@
                     Board Theme
                 </label>
 
-                <select
-                    id="editBoardColor"
-                    class="form-select">
+                <label class="form-label mt-3">Board Theme</label>
 
-                    <option value="#f4f6fb">Light</option>
-                    <option value="#374151">Slate</option>
-                    <option value="#2563eb">Ocean</option>
-                    <option value="#7c3aed">Purple</option>
-                    <option value="#991b1b">Rose</option>
+                <div id="themePicker" class="theme-picker">
 
-                </select>
+                    <div class="theme-option selected"
+                        data-theme="light"
+                        data-color="#f4f6fb">
+                    </div>
+
+                    <div class="theme-option"
+                        data-theme="slate"
+                        data-color="#374151">
+                    </div>
+
+                    <div class="theme-option"
+                        data-theme="ocean"
+                        data-color="#2563eb">
+                    </div>
+
+                    <div class="theme-option"
+                        data-theme="purple"
+                        data-color="#7c3aed">
+                    </div>
+
+                    <div class="theme-option"
+                        data-theme="rose"
+                        data-color="#991b1b">
+                    </div>
+
+                </div>
+
+                <input
+                    type="hidden"
+                    id="boardColor"
+                    value="#f4f6fb">
 
             </div>
 
