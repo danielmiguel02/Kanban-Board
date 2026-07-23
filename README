@@ -43,7 +43,7 @@ Project is built in Node.js and Express, used Prisma with Neon for database.
 AUTH ROUTES
 METHOD       ROUTES                     DESCRIPTION
 -----------------------------------------------------------------------------
-GET          /auth/me                   Get's user. (Login)
+GET          /auth/me                   Gets user. (Login)
 POST         /auth/register             Registers a user.
 POST         /auth/login                Logs in a user.
 POST         /auth/logout               Logs out a user. (Client-side logout (JWT token removal))
@@ -51,32 +51,34 @@ POST         /auth/logout               Logs out a user. (Client-side logout (JW
 BOARD ROUTES
 METHOD       ROUTES                     DESCRIPTION
 -----------------------------------------------------------------------------
-GET          /boards/                   Get's all boards user logged in is associated.
+GET          /boards/                   Gets all boards user logged in is associated.
+GET          /boards/:boardId           Gets board with board id.
 POST         /boards/                   Creates a new board.
 POST         /boards/:boardId/members   Adds member to board.
-PATCH        /boards/:boardId           Edit board name.
+PATCH        /boards/:boardId           Edit board.
 PATCH        /boards/:boardId/archive   Archives board. (This will archive all columns/cards associated with board.)
 PATCH        /boards/:boardId/unarchive Unarchived board. (This will unarchive all columns/cards associated with board.)
 PATCH        /boards/:boardId/members   Edit member role. (EDIT, VIEW)
 DELETE       /boards/:boardId           Deletes board. (This will delete all columns/cards associated with board.)
-DELETE       /boards/:boardId/members   Removed member from board.
+DELETE       /boards/:boardId/members   Remove member from board.
 
 COLUMN ROUTES
 METHOD       ROUTES                        DESCRIPTION
 -----------------------------------------------------------------------------
-GET          /columns/:boardId             Get's all columns from board id.
+GET          /columns/:boardId             Gets all columns from board id.
 POST         /columns/:boardId             Creates a new column on the board.
 PATCH        /columns/:columnId            Edit column name.
 PATCH        /columns/:columnId/archive    Archives column. (This will archive all cards associated with column.)
 PATCH        /columns/:columnId/unarchive  Unarhives column. (This will unarchive all cards associated with column.)
+PATCH        /columns/:columnId/move       Moves column to another position.
 DELETE       /columns/:columnId            Deletes column. (This will delete all cards associated with column.)
 
 CARD ROUTES
 METHOD       ROUTES                          DESCRIPTION
 -----------------------------------------------------------------------------
-GET          /cards/:columnId                Get's all cards from column id.
+GET          /cards/:columnId                Gets all cards from column id.
 POST         /cards/:columnId                Creates a new card on the column.
-PATCH        /cards/:cardId                  Edit card title.
+PATCH        /cards/:cardId                  Edit card.
 PATCH        /cards/:cardId/move/:columnId   Updates card columnId. (This works when you move one card to another column.)
 PATCH        /cards/:cardId/archive          Archives card.
 PATCH        /cards/:cardId/unarchive        Unarchives card.
