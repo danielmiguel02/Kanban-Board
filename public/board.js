@@ -22,7 +22,7 @@ let addCardModal;
 const editBoardBtn = document.getElementById("editBoardBtn");
 
 const editBoardNameInput = document.getElementById("editBoardName");
-const editBoardColorInput = document.getElementById("editBoardColor");
+const editBoardColorInput = document.getElementById("boardColor");
 
 const saveBoardChangesBtn = document.getElementById("saveBoardChangesBtn");
 
@@ -113,6 +113,22 @@ const THEMES = {
 
 document.addEventListener("DOMContentLoaded", async () => {
 
+    document.querySelectorAll(".theme-option").forEach(option => {
+
+    option.addEventListener("click", () => {
+
+        document
+            .querySelectorAll(".theme-option")
+            .forEach(o => o.classList.remove("selected"));
+
+        option.classList.add("selected");
+
+        editBoardColorInput.value = option.dataset.color;
+
+    });
+
+});
+
     addColumnModal = new bootstrap.Modal(document.getElementById("addColumnModal"));
     addCardModal = new bootstrap.Modal(document.getElementById("addCardModal"));
     editBoardModal = new bootstrap.Modal(document.getElementById("editBoardModal"));
@@ -169,7 +185,7 @@ async function loadBoard() {
 
     boardName.textContent = currentBoard.name;
 
-    applyTheme(currentBoard.themePicker);
+    applyTheme(currentBoard.color);
 }
 
 /* =========================
@@ -570,7 +586,7 @@ function openEditBoardModal() {
 
     editBoardNameInput.value = boardName.textContent;
 
-    editBoardColorInput.value = currentBoard.themePicker;
+    editBoardColorInput.value = currentBoard.color;
 
     editBoardModal.show();
 
