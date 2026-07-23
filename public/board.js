@@ -169,7 +169,7 @@ async function loadBoard() {
 
     boardName.textContent = currentBoard.name;
 
-    applyTheme(currentBoard.color);
+    applyTheme(currentBoard.themePicker);
 }
 
 /* =========================
@@ -570,7 +570,7 @@ function openEditBoardModal() {
 
     editBoardNameInput.value = boardName.textContent;
 
-    editBoardColorInput.value = currentBoard.color;
+    editBoardColorInput.value = currentBoard.themePicker;
 
     editBoardModal.show();
 
