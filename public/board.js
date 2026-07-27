@@ -35,6 +35,12 @@ let currentUser;
 let selectedItemId = null;
 let selectedItemType = null;
 
+const contextMenu = document.getElementById("contextMenu");
+
+const renameBtn = document.getElementById("renameBtn");
+const archiveBtn = document.getElementById("archiveBtn");
+const deleteBtn = document.getElementById("deleteBtn");
+
 /* =========================
    DRAG STATE
 ========================= */
@@ -228,7 +234,9 @@ async function renderColumns(columns) {
         columnEl.innerHTML = `
             <div class="column-header" draggable="true">
 
-                <strong>${column.name}</strong>
+                <strong class="column-title">
+                    ${column.name}
+                </strong>
 
                 <button class="btn btn-sm btn-outline-primary add-card-btn">
                     + Add Card
@@ -240,6 +248,7 @@ async function renderColumns(columns) {
         `;
 
         const header = columnEl.querySelector(".column-header");
+        const title = columnEl.querySelector(".column-title");
 
         columnEl.addEventListener("contextmenu", e => {
 
@@ -251,6 +260,12 @@ async function renderColumns(columns) {
                 "column",
                 column.id
             );
+
+        });
+
+        title.addEventListener("dblclick", () => {
+
+            renameColumn(column.id, title);
 
         });
 
@@ -314,6 +329,15 @@ async function renderColumns(columns) {
 
             activeColumnIdInput.value = column.id;
             addCardModal.show();
+
+        });
+
+        title.addEventListener("dblclick", () => {
+
+            enableColumnRename(
+                title,
+                column.id
+            );
 
         });
 
@@ -671,6 +695,111 @@ function openContextMenu(x, y, type, id) {
 }
 
 document.addEventListener("click", () => {
+
+    contextMenu.classList.add("d-none");
+
+});
+
+renameAction.addEventListener("click", () => {
+
+    if (selectedItemType === "column") {
+
+        renameColumn(selectedItemId);
+
+    }
+
+});
+
+async function renameColumn(columnId, titleElement){
+
+    const newName = prompt(
+        "Column name:",
+        titleElement.textContent
+    );
+
+    if(!newName) return;
+
+    const response = await fetch(
+        `${API}/columns/${columnId}`,
+        {
+            method:"PATCH",
+            credentials:"include",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                name:newName
+            })
+        }
+    );
+
+    if(response.ok){
+
+        titleElement.textContent = newName;
+
+    }
+
+}
+
+renameBtn.addEventListener("click", async () => {
+
+    if(selectedItemType === "column"){
+
+        const title =
+            document.querySelector(
+            `.kanban-column[data-id="${selectedItemId}"] .column-title`
+            );
+
+            await renameColumn(selectedItemId, title);
+
+    }
+
+    contextMenu.classList.add("d-none");
+
+});
+
+/* =========================
+   Archive
+========================= */
+
+archiveBtn.addEventListener("click", async () => {
+
+    if(selectedItemType === "column"){
+
+        await fetch(
+            `${API}/columns/${selectedItemId}/archive`,
+            {
+                method:"PATCH",
+                credentials:"include"
+            }
+        );
+
+        await loadColumns();
+    }
+
+    contextMenu.classList.add("d-none");
+
+});
+
+/* =========================
+   Delete
+========================= */
+
+deleteBtn.addEventListener("click", async () => {
+
+    if(selectedItemType !== "column") return;
+
+    if(!confirm("Delete this column?")) return;
+
+    await fetch(
+        `${API}/columns/${selectedItemId}`,
+        {
+            method:"DELETE",
+            credentials:"include"
+        }
+    );
+
+    await loadColumns();
 
     contextMenu.classList.add("d-none");
 
