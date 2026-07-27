@@ -487,3 +487,53 @@ html{
     background:#991b1b;
 
 }
+
+/* =========================
+   CONTEXT MENU
+========================= */
+
+.context-menu{
+
+    position:absolute;
+
+    min-width:180px;
+
+    background:white;
+
+    border:1px solid #ddd;
+
+    border-radius:10px;
+
+    box-shadow:0 12px 30px rgba(0,0,0,.15);
+
+    padding:6px;
+
+    z-index:9999;
+
+}
+
+.context-menu button{
+
+    width:100%;
+
+    border:none;
+
+    background:none;
+
+    text-align:left;
+
+    padding:10px 12px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    font-size:14px;
+
+}
+
+.context-menu button:hover{
+
+    background:#f4f6fb;
+
+}

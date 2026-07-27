@@ -32,6 +32,9 @@ let currentBoard = null;
 
 let currentUser;
 
+let selectedItemId = null;
+let selectedItemType = null;
+
 /* =========================
    DRAG STATE
 ========================= */
@@ -237,6 +240,19 @@ async function renderColumns(columns) {
         `;
 
         const header = columnEl.querySelector(".column-header");
+
+        columnEl.addEventListener("contextmenu", e => {
+
+            e.preventDefault();
+
+            openContextMenu(
+                e.pageX,
+                e.pageY,
+                "column",
+                column.id
+            );
+
+        });
 
         /* =========================
            COLUMN DRAG (HEADER ONLY)
@@ -637,6 +653,28 @@ async function saveBoardChanges() {
     await loadColumns();
 
 }
+
+/* =========================
+   OPEN CONTEXT MENU
+========================= */
+
+function openContextMenu(x, y, type, id) {
+
+    selectedItemType = type;
+    selectedItemId = id;
+
+    contextMenu.style.left = `${x}px`;
+    contextMenu.style.top = `${y}px`;
+
+    contextMenu.classList.remove("d-none");
+
+}
+
+document.addEventListener("click", () => {
+
+    contextMenu.classList.add("d-none");
+
+});
 
 /* =========================
    LOGOUT
