@@ -234,9 +234,7 @@ async function renderColumns(columns) {
         columnEl.innerHTML = `
             <div class="column-header" draggable="true">
 
-                <strong class="column-title">
-                    ${column.name}
-                </strong>
+                <strong class="column-title">${column.name}</strong>
 
                 <button class="btn btn-sm btn-outline-primary add-card-btn">
                     + Add Card
@@ -265,7 +263,7 @@ async function renderColumns(columns) {
 
         title.addEventListener("dblclick", () => {
 
-            renameColumn(column.id, title);
+            renameColumn(column.id);
 
         });
 
@@ -710,32 +708,81 @@ renameAction.addEventListener("click", () => {
 
 });
 
-async function renameColumn(columnId, titleElement){
+async function renameColumn(columnId) {
+
+    const titleElement = document.querySelector(
+        `.kanban-column[data-id="${columnId}"] .column-title`
+    );
 
     const newName = prompt(
         "Column name:",
         titleElement.textContent
     );
 
-    if(!newName) return;
+    if (!newName) return;
 
     const response = await fetch(
         `${API}/columns/${columnId}`,
         {
-            method:"PATCH",
-            credentials:"include",
-            headers:{
-                "Content-Type":"application/json"
+            method: "PATCH",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
             },
-            body:JSON.stringify({
-                name:newName
+            body: JSON.stringify({
+                name: newName
+            })
+        }
+    );
+
+    if (response.ok) {
+        titleElement.textContent = newName;
+    }
+
+}
+
+renameBtn.addEventListener("click", async () => {
+
+    if (selectedItemType === "column") {
+
+        await renameColumn(selectedItemId);
+
+    }
+
+    contextMenu.classList.add("d-none");
+
+});
+
+async function renameCard(cardId) {
+
+    const cardElement = document.querySelector(
+        `.kanban-card[data-id="${cardId}"]`
+    );
+
+    const newTitle = prompt(
+        "Card title:",
+        cardElement.textContent
+    );
+
+    if (!newTitle) return;
+
+    const response = await fetch(
+        `${API}/cards/${cardId}`,
+        {
+            method: "PATCH",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                title: newTitle
             })
         }
     );
 
     if(response.ok){
 
-        titleElement.textContent = newName;
+        cardElement.textContent = newTitle;
 
     }
 
@@ -745,12 +792,12 @@ renameBtn.addEventListener("click", async () => {
 
     if(selectedItemType === "column"){
 
-        const title =
-            document.querySelector(
-            `.kanban-column[data-id="${selectedItemId}"] .column-title`
-            );
+        await renameColumn(selectedItemId);
 
-            await renameColumn(selectedItemId, title);
+    }
+    else{
+
+        await renameCard(selectedItemId);
 
     }
 
@@ -774,8 +821,20 @@ archiveBtn.addEventListener("click", async () => {
             }
         );
 
-        await loadColumns();
     }
+    else{
+
+        await fetch(
+            `${API}/cards/${selectedItemId}/archive`,
+            {
+                method:"PATCH",
+                credentials:"include"
+            }
+        );
+
+    }
+
+    await loadColumns();
 
     contextMenu.classList.add("d-none");
 
@@ -787,17 +846,30 @@ archiveBtn.addEventListener("click", async () => {
 
 deleteBtn.addEventListener("click", async () => {
 
-    if(selectedItemType !== "column") return;
+    if(!confirm("Delete this item?")) return;
 
-    if(!confirm("Delete this column?")) return;
+    if(selectedItemType === "column"){
 
-    await fetch(
-        `${API}/columns/${selectedItemId}`,
-        {
-            method:"DELETE",
-            credentials:"include"
-        }
-    );
+        await fetch(
+            `${API}/columns/${selectedItemId}`,
+            {
+                method:"DELETE",
+                credentials:"include"
+            }
+        );
+
+    }
+    else{
+
+        await fetch(
+            `${API}/cards/${selectedItemId}`,
+            {
+                method:"DELETE",
+                credentials:"include"
+            }
+        );
+
+    }
 
     await loadColumns();
 
