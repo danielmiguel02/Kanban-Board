@@ -22,7 +22,7 @@ let addCardModal;
 const editBoardBtn = document.getElementById("editBoardBtn");
 
 const editBoardNameInput = document.getElementById("editBoardName");
-const editBoardColorInput = document.getElementById("boardColor");
+const editBoardColorInput = document.getElementById("editBoardColor");
 
 const saveBoardChangesBtn = document.getElementById("saveBoardChangesBtn");
 
@@ -248,6 +248,10 @@ async function renderColumns(columns) {
         const header = columnEl.querySelector(".column-header");
         const title = columnEl.querySelector(".column-title");
 
+        title.addEventListener("dblclick", () => {
+            startRenameColumn(column.id);
+        });
+
         columnEl.addEventListener("contextmenu", e => {
 
             e.preventDefault();
@@ -258,12 +262,6 @@ async function renderColumns(columns) {
                 "column",
                 column.id
             );
-
-        });
-
-        title.addEventListener("dblclick", () => {
-
-            renameColumn(column.id);
 
         });
 
@@ -330,15 +328,6 @@ async function renderColumns(columns) {
 
         });
 
-        title.addEventListener("dblclick", () => {
-
-            enableColumnRename(
-                title,
-                column.id
-            );
-
-        });
-
         columnsContainer.appendChild(columnEl);
 
     });
@@ -372,6 +361,23 @@ async function loadCards(columnId) {
         cardEl.draggable = true;
 
         cardEl.textContent = card.title;
+
+        cardEl.addEventListener("dblclick", () => {
+            startRenameCard(card.id);
+        });
+
+        cardEl.addEventListener("contextmenu", e => {
+
+            e.preventDefault();
+
+            openContextMenu(
+                e.pageX,
+                e.pageY,
+                "card",
+                card.id
+            );
+
+        });
 
         cardEl.addEventListener("dragstart", () => {
 
@@ -698,28 +704,51 @@ document.addEventListener("click", () => {
 
 });
 
-renameAction.addEventListener("click", () => {
+async function startRenameColumn(columnId) {
 
-    if (selectedItemType === "column") {
-
-        renameColumn(selectedItemId);
-
-    }
-
-});
-
-async function renameColumn(columnId) {
-
-    const titleElement = document.querySelector(
+    const title = document.querySelector(
         `.kanban-column[data-id="${columnId}"] .column-title`
     );
 
-    const newName = prompt(
-        "Column name:",
-        titleElement.textContent
-    );
+    if (!title) return;
 
-    if (!newName) return;
+    const currentName = title.textContent;
+
+    const input = document.createElement("input");
+
+    input.className = "form-control form-control-sm";
+    input.value = currentName;
+
+    title.replaceWith(input);
+
+    input.focus();
+    input.select();
+
+    input.addEventListener("keydown", async e => {
+
+        if (e.key === "Enter") {
+            await finishRenameColumn(columnId, input);
+        }
+
+        if (e.key === "Escape") {
+            cancelRenameColumn(currentName, input);
+        }
+
+    });
+
+    input.addEventListener("blur", async () => {
+        await finishRenameColumn(columnId, input);
+    });
+
+}
+
+async function finishRenameColumn(columnId, input) {
+
+    let newName = input.value.trim();
+
+    if (!newName) {
+        newName = "Untitled";
+    }
 
     const response = await fetch(
         `${API}/columns/${columnId}`,
@@ -735,17 +764,43 @@ async function renameColumn(columnId) {
         }
     );
 
-    if (response.ok) {
-        titleElement.textContent = newName;
-    }
+    const title = document.createElement("strong");
+
+    title.className = "column-title";
+    title.textContent = newName;
+
+    title.addEventListener("dblclick", () => {
+        startRenameColumn(columnId);
+    });
+
+    input.replaceWith(title);
 
 }
 
-renameBtn.addEventListener("click", async () => {
+function cancelRenameColumn(oldName, input){
+
+    const title = document.createElement("strong");
+
+    title.className = "column-title";
+    title.textContent = oldName;
+
+    title.addEventListener("dblclick", () => {
+        startRenameColumn(input.closest(".kanban-column").dataset.id);
+    });
+
+    input.replaceWith(title);
+
+}
+
+renameBtn.addEventListener("click", () => {
 
     if (selectedItemType === "column") {
 
-        await renameColumn(selectedItemId);
+        startRenameColumn(selectedItemId);
+
+    } else {
+
+        startRenameCard(selectedItemId);
 
     }
 
@@ -753,18 +808,52 @@ renameBtn.addEventListener("click", async () => {
 
 });
 
-async function renameCard(cardId) {
+async function startRenameCard(cardId) {
 
-    const cardElement = document.querySelector(
+    const card = document.querySelector(
         `.kanban-card[data-id="${cardId}"]`
     );
 
-    const newTitle = prompt(
-        "Card title:",
-        cardElement.textContent
-    );
+    if (!card) return;
 
-    if (!newTitle) return;
+    const currentTitle = card.textContent;
+
+    const input = document.createElement("input");
+
+    input.className = "form-control form-control-sm";
+    input.value = currentTitle;
+
+    card.textContent = "";
+    card.appendChild(input);
+
+    input.focus();
+    input.select();
+
+    input.addEventListener("keydown", async e => {
+
+        if (e.key === "Enter") {
+            await finishRenameCard(cardId, input);
+        }
+
+        if (e.key === "Escape") {
+            cancelRenameCard(currentTitle, input);
+        }
+
+    });
+
+    input.addEventListener("blur", async () => {
+        await finishRenameCard(cardId, input);
+    });
+
+}
+
+async function finishRenameCard(cardId, input) {
+
+    let newTitle = input.value.trim();
+
+    if (!newTitle) {
+        newTitle = "Untitled";
+    }
 
     const response = await fetch(
         `${API}/cards/${cardId}`,
@@ -780,30 +869,34 @@ async function renameCard(cardId) {
         }
     );
 
-    if(response.ok){
-
-        cardElement.textContent = newTitle;
-
+    if (!response.ok) {
+        alert("Unable to rename card.");
+        return;
     }
+
+    const card = document.querySelector(
+        `.kanban-card[data-id="${cardId}"]`
+    );
+
+    card.textContent = newTitle;
+
+    card.addEventListener("dblclick", () => {
+        startRenameCard(cardId);
+    });
 
 }
 
-renameBtn.addEventListener("click", async () => {
+function cancelRenameCard(oldTitle, input) {
 
-    if(selectedItemType === "column"){
+    const card = input.parentElement;
 
-        await renameColumn(selectedItemId);
+    card.textContent = oldTitle;
 
-    }
-    else{
+    card.addEventListener("dblclick", () => {
+        startRenameCard(card.dataset.id);
+    });
 
-        await renameCard(selectedItemId);
-
-    }
-
-    contextMenu.classList.add("d-none");
-
-});
+}
 
 /* =========================
    Archive
