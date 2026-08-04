@@ -178,6 +178,7 @@ const getArchivedColumns = async (req, res) => {
     try {
         const archivedColumns = await getArchivedColumnsService({
             userId: req.user.id,
+            boardId: Number(req.params.boardId),
         });
     } catch (error) {
         return res.status(400).json({
