@@ -139,4 +139,18 @@ const unarchiveCard = async (data) => {
     });
 };
 
-export { getCardsRepository, createCard, editCard, deleteCard, moveCardToColumn, getCardsLastPos, findCardById, reorderCards, archiveCard, unarchiveCard };
+const getArchivedCardsRepository = async (boardId) => {
+    return prisma.card.findMany({
+        where: {
+            archived: true,
+            column: {
+                boardId,
+            },
+        },
+        orderBy: {
+            position: "asc",
+        },
+    });
+};
+
+export { getCardsRepository, createCard, editCard, deleteCard, moveCardToColumn, getCardsLastPos, findCardById, reorderCards, archiveCard, unarchiveCard, getArchivedCardsRepository };
