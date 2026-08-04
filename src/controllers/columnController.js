@@ -1,4 +1,4 @@
-import { getColumnsService, createColumnService, editColumnService, deleteColumnService, moveColumnService, archiveColumnService, unarchiveColumnService } from '../services/columnService.js';
+import { getColumnsService, createColumnService, editColumnService, deleteColumnService, moveColumnService, archiveColumnService, unarchiveColumnService, getArchivedColumnsService } from '../services/columnService.js';
 
 const getColumns = async (req, res) => {
     try {
@@ -174,4 +174,16 @@ const unarchiveColumn = async (req, res) => {
     }
 };
 
-export { getColumns, createColumn, editColumn, deleteColumn, moveColumn, archiveColumn, unarchiveColumn };
+const getArchivedColumns = async (req, res) => {
+    try {
+        const archivedColumns = await getArchivedColumnsService({
+            userId: req.user.id,
+        });
+    } catch (error) {
+        return res.status(400).json({
+            message: error.message,
+        });
+    }
+};
+
+export { getColumns, createColumn, editColumn, deleteColumn, moveColumn, archiveColumn, unarchiveColumn, getArchivedColumns };
