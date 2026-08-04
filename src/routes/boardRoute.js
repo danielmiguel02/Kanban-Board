@@ -1,11 +1,18 @@
 import express from 'express';
+<<<<<<< HEAD
 import { getBoard, getBoards, createBoard, editBoard, deleteBoard, archiveBoard, unarchiveBoard, addMembersToBoard, removeMembersFromBoard, editMembersRoleFromBoard } from '../controllers/boardController.js';
+=======
+import { getBoards, createBoard, editBoard, deleteBoard, archiveBoard, unarchiveBoard, addMembersToBoard, removeMembersFromBoard, editMembersRoleFromBoard } from '../controllers/boardController.js';
+>>>>>>> feat/kanban-controller
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
 router.get("/", authMiddleware, getBoards);
+<<<<<<< HEAD
 router.get("/:boardId", authMiddleware, getBoard);
+=======
+>>>>>>> feat/kanban-controller
 router.post("/", authMiddleware, createBoard);
 router.patch("/:id", authMiddleware, editBoard);
 router.delete("/:boardId", authMiddleware, deleteBoard);

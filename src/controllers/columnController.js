@@ -1,4 +1,22 @@
-import { createColumnService, editColumnService, deleteColumnService, archiveColumnService, unarchiveColumnService } from '../services/columnService.js';
+import { getColumnsService, createColumnService, editColumnService, deleteColumnService, moveColumnService, archiveColumnService, unarchiveColumnService, getArchivedColumnsService } from '../services/columnService.js';
+
+const getColumns = async (req, res) => {
+    try {
+        const columns = await getColumnsService({
+            userId: req.user.id,
+            boardId: Number(req.params.boardId),
+        });
+
+        return res.status(200).json({
+            message: "Columns retrieved successfully",
+            columns,
+        });
+    } catch (error) {
+        return res.status(400).json({
+            message: error.message,
+        });
+    }
+};
 
 const createColumn = async (req, res) => {
     try {
@@ -81,6 +99,29 @@ const deleteColumn = async (req, res) => {
     }
 };
 
+const moveColumn = async (req, res) => {
+    try {
+
+        const result = await moveColumnService({
+            columnId: Number(req.params.columnId),
+            position: Number(req.body.position),
+            userId: req.user.id,
+        });
+
+        return res.status(200).json({
+            message: "Column moved successfully",
+            column: result,
+        });
+
+    } catch (error) {
+
+        return res.status(400).json({
+            message: error.message,
+        });
+
+    }
+};
+
 const archiveColumn = async (req, res) => {
     try {
         const columnId = Number(req.params.columnId);
@@ -133,4 +174,17 @@ const unarchiveColumn = async (req, res) => {
     }
 };
 
-export { createColumn, editColumn, deleteColumn, archiveColumn, unarchiveColumn };
+const getArchivedColumns = async (req, res) => {
+    try {
+        const archivedColumns = await getArchivedColumnsService({
+            userId: req.user.id,
+            boardId: Number(req.params.boardId),
+        });
+    } catch (error) {
+        return res.status(400).json({
+            message: error.message,
+        });
+    }
+};
+
+export { getColumns, createColumn, editColumn, deleteColumn, moveColumn, archiveColumn, unarchiveColumn, getArchivedColumns };

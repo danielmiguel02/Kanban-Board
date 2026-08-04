@@ -1,5 +1,36 @@
 import { prisma } from "../config/db.js";
 
+const getSharedBoardsRepository = async (userId) => {
+    return prisma.boardMember.findMany({
+        where: {
+            userId,
+            board: {
+                archived: false,
+            },
+        },
+        select: {
+            role: true,
+            board: {
+                select: {
+                    id: true,
+                    name: true,
+                    position: true,
+                    owner: {
+                        select: {
+                            name: true,
+                        },
+                    },
+                },
+            },
+        },
+        orderBy: {
+            board: {
+                position: "asc",
+            },
+        },
+    });
+};
+
 const findBoardMember = async (boardId, userId) => {
     return prisma.boardMember.findUnique({
         where: {

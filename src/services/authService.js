@@ -50,14 +50,12 @@ const loginUserService = async (data) => {
     const token = generateToken({id: user.id });
 
     return {
-        data: {
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-            },
-            token
+        user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
         },
+        token,
     };
 };
 

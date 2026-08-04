@@ -1,6 +1,26 @@
-import { findCardById, getCardsLastPos, reorderCards, createCard, editCard, deleteCard, moveCardToColumn, archiveCard, unarchiveCard} from "../repositories/cardRepository.js";
+import { getCardsRepository, findCardById, getCardsLastPos, reorderCards, createCard, editCard, deleteCard, moveCardToColumn, archiveCard, unarchiveCard} from "../repositories/cardRepository.js";
 import { findColumnById } from "../repositories/columnRepository.js";
 import { checkBoardPermission } from "./permissionService.js";
+
+const getCardsService = async ({ userId, columnId }) => {
+
+    if (!columnId)
+        throw new Error("ColumnId is required.");
+
+    const column = await findColumnById(columnId);
+
+    if (!column)
+        throw new Error("Column not found.");
+
+    await checkBoardPermission({
+        boardId: column.boardId,
+        userId,
+        requiredRole: "VIEW"
+    });
+
+    return await getCardsRepository(columnId);
+
+};
 
 const createCardService = async ({data, columnId, userId}) => {
     const { title } = data;
@@ -122,18 +142,19 @@ const deleteCardService = async ({cardId, userId}) => {
     await reorderCards(userId);
 };
 
-const moveCardToColumnService = async ({cardId, columnId, userId}) => {
+const moveCardToColumnService = async ({ cardId, columnId, userId }) => {
+
     const card = await findCardById(cardId);
 
-    if (!card) {
+    if (!card)
         throw new Error("Card not found");
-    }
+
+    const oldColumnId = card.columnId;
 
     const column = await findColumnById(columnId);
 
-    if (!column) {
+    if (!column)
         throw new Error("Column not found");
-    }
 
     await checkBoardPermission({
         boardId: column.boardId,
@@ -141,20 +162,26 @@ const moveCardToColumnService = async ({cardId, columnId, userId}) => {
         requiredRole: "EDIT",
     });
 
-    if (card.archived) {
-        throw new Error("Card is archived can't move card");
-    }
+    if (card.archived)
+        throw new Error("Card is archived.");
 
-    if (column.archived) {
-        throw new Error("Column is archived can't move card");
-    }
+    if (column.archived)
+        throw new Error("Column is archived.");
 
     const movedCard = await moveCardToColumn({
         cardId,
-        columnId
+        columnId,
     });
-    
-    await reorderCards(userId);
+
+    await reorderCards({
+        columnId: oldColumnId
+    });
+
+    if (oldColumnId !== columnId) {
+        await reorderCards({
+            columnId
+        });
+    }
 
     return {
         data: {
@@ -236,4 +263,4 @@ const unarchiveCardService = async ({cardId, userId}) => {
     await reorderCards(userId);
 };
 
-export { createCardService, editCardService, deleteCardService, moveCardToColumnService, archiveCardService, unarchiveCardService };
+export { getCardsService, createCardService, editCardService, deleteCardService, moveCardToColumnService, archiveCardService, unarchiveCardService };

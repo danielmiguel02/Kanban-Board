@@ -1,5 +1,23 @@
 import { prisma } from "../config/db.js";
 
+const getBoardsRepository = async (userId) => {
+    return prisma.board.findMany({
+        where: {
+            ownerId: userId,
+            archived: false,
+        },
+        select: {
+            id: true,
+            name: true,
+            position: true,
+            archived: true,
+        },
+        orderBy: {
+            position: "asc",
+        },
+    });
+};
+
 const createBoard = async (data) => {
     const { name, ownerId, position } = data;
 
@@ -56,15 +74,6 @@ const findBoardById = async (id) => {
     return prisma.board.findUnique({
         where: {
             id,
-        },
-    });
-};
-
-const findOwnedBoard = async (boardId, userId) => {
-    return prisma.board.findFirst({
-        where: {
-            id: boardId,
-            ownerId: userId,
         },
     });
 };
@@ -177,15 +186,4 @@ const unarchiveBoard = async (data) => {
     });
 }
 
-const isBoardArchived = async (boardId) => {
-    return prisma.board.findUnique({
-        where: {
-            id: boardId,
-        },
-        select: {
-            archived: true,
-        },
-    });
-};
-
-export { createBoard, editBoard, deleteBoard, findBoardById, findOwnedBoard, reorderBoards, getBoardsLastPos, archiveBoard, unarchiveBoard, isBoardArchived };
+export { getBoardsRepository, createBoard, editBoard, deleteBoard, findBoardById, reorderBoards, getBoardsLastPos, archiveBoard, unarchiveBoard };

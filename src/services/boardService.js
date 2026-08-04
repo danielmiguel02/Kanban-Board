@@ -1,7 +1,39 @@
-import { createBoard, editBoard, deleteBoard, findBoardById, reorderBoards, getBoardsLastPos, archiveBoard, unarchiveBoard, isBoardArchived } from '../repositories/boardRepository.js';
+import { getBoardsRepository, getBoardRepository, createBoard, editBoard, deleteBoard, findBoardById, reorderBoards, getBoardsLastPos, archiveBoard, unarchiveBoard } from '../repositories/boardRepository.js';
 
+const getBoardsService = async (userId) => {
+    if (!userId) {
+        throw new Error("User is required to get boards.")
+    }
+
+    const boards = await getBoardsRepository(userId);
+
+    return boards;
+};
+
+const getBoardService = async ({ boardId, ownerId }) => {
+
+    if (!boardId)
+        throw new Error("Board id is required.");
+
+    const board = await getBoardRepository(boardId);
+
+    if (!board)
+        throw new Error("Board not found.");
+
+    const isOwner = board.ownerId === ownerId;
+
+    const isMember = board.members.some(
+        member => member.userId === ownerId
+    );
+
+    if (!isOwner && !isMember)
+        throw new Error("Not authorized.");
+
+    return board;
+};
+ 
 const createBoardService = async ({data, ownerId}) => {
-    const { name } = data;
+    const { name, color } = data;
 
     if (!name) {
         throw new Error("Name is required to create a board.");
@@ -12,6 +44,7 @@ const createBoardService = async ({data, ownerId}) => {
 
     const createdBoard = await createBoard({
         name,
+        color,
         ownerId,
         position: boardsLastPos + 1,
     });
@@ -21,6 +54,7 @@ const createBoardService = async ({data, ownerId}) => {
             board: {
                 id: createdBoard.id,
                 name: createdBoard.name,
+                color: createdBoard.color,
                 ownerId: ownerId,
                 position: boardsLastPos + 1,
             },
@@ -29,7 +63,7 @@ const createBoardService = async ({data, ownerId}) => {
 };
 
 const editBoardService = async ({data, boardId, ownerId}) => {
-    const { name } = data;
+    const { name, color } = data;
 
     if (!name) {
         throw new Error("Name is required to edit a board.");
@@ -45,8 +79,13 @@ const editBoardService = async ({data, boardId, ownerId}) => {
         throw new Error("Not authorized to edit this board");
     }
 
+    if (board.archived) {
+        throw new Error("Can't edit archived board");
+    }
+
     const editedBoard = await editBoard({
         name,
+        color,
         boardId
     });
 
@@ -55,6 +94,7 @@ const editBoardService = async ({data, boardId, ownerId}) => {
             board: {
                 id: editedBoard.id,
                 name: editedBoard.name,
+                color: editedBoard.color,
                 ownerId: ownerId
             },
         },
@@ -90,10 +130,8 @@ const archiveBoardService = async ({boardId, userId}) => {
         throw new Error("Not authorized to archive this board");
     }
 
-    const boardArchived = await isBoardArchived(boardId);
-
-    if (boardArchived?.archived) {
-        throw new Error("Board is not unarchived, can't archive");
+    if (board.archived) {
+        throw new Error("Board is already archived, can't archive");
     }
 
     await archiveBoard({
@@ -113,10 +151,8 @@ const unarchiveBoardService = async ({boardId, userId}) => {
     if (board.ownerId !== userId) {
         throw new Error("Not authorized to unarchive this board");
     }
-    
-    const boardArchived = await isBoardArchived(boardId);
 
-    if (!boardArchived?.archived) {
+    if (!board.archived) {
         throw new Error("Board is not archived, can't unarchive");
     }
 
@@ -127,4 +163,4 @@ const unarchiveBoardService = async ({boardId, userId}) => {
     await reorderBoards(userId);
 };
 
-export { createBoardService, editBoardService, deleteBoardService, archiveBoardService, unarchiveBoardService };
+export { getBoardsService, getBoardService, createBoardService, editBoardService, deleteBoardService, archiveBoardService, unarchiveBoardService };

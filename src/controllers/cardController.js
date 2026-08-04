@@ -1,4 +1,23 @@
-import { createCardService, editCardService, deleteCardService, moveCardToColumnService, archiveCardService, unarchiveCardService } from "../services/cardService.js";
+import { getCardsService, createCardService, editCardService, deleteCardService, moveCardToColumnService, archiveCardService, unarchiveCardService, getArchivedCardsService } from "../services/cardService.js";
+
+const getCards = async (req, res) => {
+    try {
+        const cards = await getCardsService({
+            userId: req.user.id,
+            columnId: Number(req.params.columnId),
+        });
+
+        return res.status(200).json({
+            message: "Cards retrieved successfully",
+            cards,
+        });
+
+    } catch (error) {
+        return res.status(400).json({
+            message: error.message,
+        });
+    }
+};
 
 const createCard = async (req, res) => {
     try {
@@ -81,29 +100,36 @@ const deleteCard = async (req, res) => {
 
 const moveCardToColumn = async (req, res) => {
     try {
-        const cardId = Number(req.params.cardId);
-        const columnId = Number(req.params.columnId);
 
-        if (isNaN(cardId) || isNaN(columnId)) {
+        const { cardId, columnId } = req.params;
+
+        const parsedCardId = Number(cardId);
+        const parsedColumnId = Number(columnId);
+
+        if (isNaN(parsedCardId) || isNaN(parsedColumnId)) {
             return res.status(400).json({
-                message: "Invalid card or column ID"
+                message: "Invalid card or column ID."
             });
         }
 
-        const result = await moveCardToColumnService({
-            cardId: cardId,
-            columnId: columnId,
+        const movedCard = await moveCardToColumnService({
+            cardId: parsedCardId,
+            columnId: parsedColumnId,
+            position: req.body.position,
             userId: req.user.id,
         });
 
         return res.status(200).json({
             message: "Card moved successfully",
-            card: result
+            card: movedCard,
         });
+
     } catch (error) {
+
         return res.status(400).json({
             message: error.message,
         });
+
     }
 };
 
@@ -159,4 +185,17 @@ const unarchiveCard = async (req, res) => {
     }
 };
 
-export { createCard, editCard, deleteCard, moveCardToColumn, archiveCard, unarchiveCard };
+const getArchivedCards = async (req, res) => {
+    try {
+        const archivedCards = await getArchivedCardsService({
+            userId: req.user.id,
+            boardId: Number(req.params.boardId),
+        });
+    } catch (error) {
+        return res.status(400).json({
+            message: error.message,
+        });
+    }
+};
+
+export { getCards, createCard, editCard, deleteCard, moveCardToColumn, archiveCard, unarchiveCard, getArchivedCards };
