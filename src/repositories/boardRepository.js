@@ -243,4 +243,16 @@ const unarchiveBoard = async (data) => {
     });
 }
 
-export { getBoardsRepository, getBoardRepository, createBoard, editBoard, deleteBoard, findBoardById, reorderBoards, getBoardsLastPos, archiveBoard, unarchiveBoard };
+const getArchivedBoardsRepository = async (userId) => {
+    return prisma.board.findMany({
+        where: {
+            userId,
+            archived: true,
+        },
+        orderBy: {
+            position: "asc",
+        },
+    });
+};
+
+export { getBoardsRepository, getBoardRepository, createBoard, editBoard, deleteBoard, findBoardById, reorderBoards, getBoardsLastPos, archiveBoard, unarchiveBoard, getArchivedBoardsRepository };
