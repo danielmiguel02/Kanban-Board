@@ -1,4 +1,4 @@
-import { getBoardsRepository, getBoardRepository, createBoard, editBoard, deleteBoard, findBoardById, reorderBoards, getBoardsLastPos, archiveBoard, unarchiveBoard } from '../repositories/boardRepository.js';
+import { getBoardsRepository, getBoardRepository, createBoard, editBoard, deleteBoard, findBoardById, reorderBoards, getBoardsLastPos, archiveBoard, unarchiveBoard, getArchivedBoardsRepository } from '../repositories/boardRepository.js';
 
 const getBoardsService = async (userId) => {
     if (!userId) {
@@ -163,4 +163,12 @@ const unarchiveBoardService = async ({boardId, userId}) => {
     await reorderBoards(userId);
 };
 
-export { getBoardsService, getBoardService, createBoardService, editBoardService, deleteBoardService, archiveBoardService, unarchiveBoardService };
+const getArchivedBoardsService = async ({userId}) => {
+    if (!userId) {
+        throw new Error("User is required to get boards.")
+    }
+
+    return await getArchivedBoardsRepository(userId);
+};
+
+export { getBoardsService, getBoardService, createBoardService, editBoardService, deleteBoardService, archiveBoardService, unarchiveBoardService, getArchivedBoardsService };
