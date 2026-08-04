@@ -189,7 +189,7 @@ const getArchivedCards = async (req, res) => {
     try {
         const archivedCards = await getArchivedCardsService({
             userId: req.user.id,
-            columnId: Number(req.params.columnId),
+            boardId: Number(req.params.boardId),
         });
     } catch (error) {
         return res.status(400).json({
