@@ -1,4 +1,4 @@
-import { getColumnsRepository, getColumnsLastPos, findColumnById, reorderColumns, createColumn, editColumn, deleteColumn, moveColumnRepository, archiveColumn, unarchiveColumn } from "../repositories/columnRepository.js";
+import { getColumnsRepository, getColumnsLastPos, findColumnById, reorderColumns, createColumn, editColumn, deleteColumn, moveColumnRepository, archiveColumn, unarchiveColumn, getArchivedColumnsRepository } from "../repositories/columnRepository.js";
 import { findBoardById } from "../repositories/boardRepository.js";
 import { checkBoardPermission } from "./permissionService.js";
 
@@ -230,4 +230,24 @@ const unarchiveColumnService = async ({columnId, userId}) => {
     await reorderColumns(column.boardId);
 };
 
-export { getColumnsService, createColumnService, editColumnService, deleteColumnService, moveColumnService, archiveColumnService, unarchiveColumnService };
+const getArchivedColumnsService = async ({userId, boardId}) => {
+    const board = await findBoardById(boardId);
+
+    if (!board) {
+        throw new Error("Board not found");
+    }
+
+    if (board.archived) {
+        throw new Error("Board is archived, can't get columns");
+    }
+
+    await checkBoardPermission({
+        boardId: boardId,
+        userId,
+        requiredRole: "VIEW",
+    });
+
+    return await getArchivedColumnsRepository(boardId);
+};
+
+export { getColumnsService, createColumnService, editColumnService, deleteColumnService, moveColumnService, archiveColumnService, unarchiveColumnService, getArchivedColumnsService };
