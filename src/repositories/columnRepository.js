@@ -170,4 +170,16 @@ const unarchiveColumn = async (data) => {
     });
 };
 
-export { getColumnsRepository, createColumn, editColumn, deleteColumn, getColumnsLastPos, findColumnById, reorderColumns, moveColumnRepository, archiveColumn, unarchiveColumn };
+const getArchivedColumnsRepository = async (boardId) => {
+    return prisma.column.findMany({
+        where: {
+            boardId,
+            archived: true,
+        },
+        orderBy: {
+            position: "asc",
+        },
+    });
+};
+
+export { getColumnsRepository, createColumn, editColumn, deleteColumn, getColumnsLastPos, findColumnById, reorderColumns, moveColumnRepository, archiveColumn, unarchiveColumn, getArchivedColumnsRepository };
