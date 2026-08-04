@@ -1,4 +1,4 @@
-import { getCardsService, createCardService, editCardService, deleteCardService, moveCardToColumnService, archiveCardService, unarchiveCardService } from "../services/cardService.js";
+import { getCardsService, createCardService, editCardService, deleteCardService, moveCardToColumnService, archiveCardService, unarchiveCardService, getArchivedCardsService } from "../services/cardService.js";
 
 const getCards = async (req, res) => {
     try {
@@ -185,4 +185,17 @@ const unarchiveCard = async (req, res) => {
     }
 };
 
-export { getCards, createCard, editCard, deleteCard, moveCardToColumn, archiveCard, unarchiveCard };
+const getArchivedCards = async (req, res) => {
+    try {
+        const archivedCards = await getArchivedCardsService({
+            userId: req.user.id,
+            boardId: Number(req.params.boardId),
+        });
+    } catch (error) {
+        return res.status(400).json({
+            message: error.message,
+        });
+    }
+};
+
+export { getCards, createCard, editCard, deleteCard, moveCardToColumn, archiveCard, unarchiveCard, getArchivedCards };
